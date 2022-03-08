@@ -160,6 +160,23 @@ Tout est dans le fichier "FS" en pj
 
 D) Vérifier er réparer un FS
 
+NB: La partition doit être démonter pour la vérifier
+
+Vérifier un fs ext4:
+fsck.ext4 /dev/sdb2
+
+-f mode vérification approfondie (pas seulement le journal)
+
+Réparer un fs ext4:
+fsck.ext4 /dev/sdb2
+
+-y : mode réparation automatique
+
+voir fichier en pj
+
+Réparer un fs ext4:
+
+
 E) Le FHS - File Hierarchy Standard
 
 
