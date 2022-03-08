@@ -285,3 +285,61 @@ top et ps
 u , puis taper le nom de l'user , il vas afficher que les processus de cet use, 
 u, entrer, vas remettre tout les processus
 f, on vas pouvoiur ajouter ou retirer des champ à top, et au meme endroit on peut avec "s" , sur le champ voulu trié a partir du champ voulu , par exemple si on veut trier sur la mémoire , on vas sur le champ mémoire , qu'on sélectionne et on tape "s" en haut on voit que top vas afficher la mémoire en priorité, exuite on fait "q" pour sortir.
+
+On peut donc par exemple reéfinir la priorité d'un process avec un "r" , puis on note le pid, et puis on change la priorité., je peut également arrété un processus avec un k, puis 15, ou un 9(dangereux)
+
+[root@srvcentos7 ~]# kill -l
+ 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP
+ 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1
+11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM
+16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP
+21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR
+31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3
+38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8
+43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13
+48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12
+53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7
+58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
+63) SIGRTMAX-1  64) SIGRTMAX
+[root@srvcentos7 ~]# ps -aux | grep clock
+jm       11365  5.9  4.7 668236 23540 ?        Sl   15:27   0:01 /usr/bin/gnome-clocks --gapplication-service
+root     11409  0.0  0.1 112812   980 pts/2    R+   15:27   0:00 grep --color=auto clock
+[root@srvcentos7 ~]# kill -STOP 11365
+[root@srvcentos7 ~]# kill -CONT 11365
+[root@srvcentos7 ~]# kill -19 11365
+[root@srvcentos7 ~]# kill -18 11365
+[root@srvcentos7 ~]# kill -19 11365
+[root@srvcentos7 ~]# kill -15 11365
+[root@srvcentos7 ~]# ps -aux | grep clock
+jm       11365  3.3  4.7 668236 23540 ?        Tl   15:27   0:06 /usr/bin/gnome-clocks --gapplication-service
+root     11567  0.0  0.1 112812   984 pts/2    R+   15:30   0:00 grep --color=auto clock
+[root@srvcentos7 ~]# kill -KILL 11365
+[root@srvcentos7 ~]# kill --help
+-bash: kill: -help: invalid signal specification
+[root@srvcentos7 ~]# killall --help
+Usage: killall [-Z CONTEXT] [-u USER] [ -eIgiqrvw ] [ -SIGNAL ] NAME...
+       killall -l, --list
+       killall -V, --version
+
+  -e,--exact          require exact match for very long names
+  -I,--ignore-case    case insensitive process name match
+  -g,--process-group  kill process group instead of process
+  -y,--younger-than   kill processes younger than TIME
+  -o,--older-than     kill processes older than TIME
+  -i,--interactive    ask for confirmation before killing
+  -l,--list           list all known signal names
+  -q,--quiet          don't print complaints
+  -r,--regexp         interpret NAME as an extended regular expression
+  -s,--signal SIGNAL  send this signal instead of SIGTERM
+  -u,--user USER      kill only process(es) running as USER
+  -v,--verbose        report if the signal was successfully sent
+  -V,--version        display version information
+  -w,--wait           wait for processes to die
+  -Z,--context REGEXP kill only process(es) having context
+                      (must precede other arguments)
+
+[root@srvcentos7 ~]#
+
+
+   
