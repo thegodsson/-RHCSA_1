@@ -104,9 +104,64 @@ brw-rw----. 1 root disk 8, 18 Mar  8 11:58 /dev/sdb2
 
 C) Introduction aux systèmes de fichiers
 
+1) C'est quoi un système de fichier ?
+- Un bon FS vas nous offrir la journalisation.
+- Une bonne gestion de la fragmentation
+Pour faire simple. Lorsqu'un utilisateur accède àun fichier, il accède à une inode.
+L'inode est un numéro unique qui permet d'identifier le ficheir ou répertoire.
+
+L'inode contient:
+  - Les permissions ou droit d'accès
+  - Le créateur ou propiétaire
+  - Nombre de blocs utilisés par le fichier
+  - Le moyen de retrouver les parties du fichier
+  - L'horodatage: la dates d'accès , de création de modifications
+  - Le nombre d'inodes détermine le nombre de fichiers sur le FS
+  - Les inodes ne contiennent pas les nom du fichier, mais les métadonnées
+
+3) Les systèmes de fichiers sous red hat
+ext2 
+ext3 : ajout de la journalisation
+ext4: Grande capacités et gestions des extents (pace réservé pour un fichier
+xfs (Utilisé par default sur redhat 7) : Grande capacité, gestion des extents, haute performances:
+Btrfs: snaphot, clone, extension, compresion, auto réparation, raid natif
+zfs: snapshot , clone , extension, déduplication, comprésion, auto réparation, raid natif
+Et quelques systèmes de fichier réseau:
+  NFS, SMB, GusterFS, CEphFs
+
+5) Creer son système de fichier
+mkfs + le type de FS:
+exemple :
+
+ext4:
+mkfs.ext4 /dev/sdb1
+
+xfs:
+mkfs.xfs /dev/sdb1
+
+xfs + labell:
+mkfs.xfs -L var /dev/sdb1
+
+
+
+7) Monter son système de fichier
+8) Le fichier /etc/fstab
+
+exemple d'entré fstab:
+UUID="860c107e-3ad0-494d-a914-6a86133175bd"     /xfs_sdb1       xfs     defaults(option, on ne met pas d'option)        0 0
+périphérique                                    oû je la monte  système de fichier    option     1er chiffre(dump, ici on ne fait pas de dump) 2ème chiffre(vérification des partitions, 0 pas de vérification, 1 vérification du 1er disque)
+
+UUID="d95436bc-be52-4722-aa10-6d1d47519a76"     /ext4_sdb2      ext4    defaults        0 2 (2 pour vérification du disque, mais après l'autre disque)
+
+Utilisation du label:
+LABEL="VM"      /xfs_sdb1       xfs     defaults        0 1
+
+Tout est dans le fichier "FS" en pj
+
 D) Vérifier er réparer un FS
 
 E) Le FHS - File Hierarchy Standard
+
 
 F) Propiété des fichiers
 
