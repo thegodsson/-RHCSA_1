@@ -179,10 +179,109 @@ Réparer un fs ext4:
 
 E) Le FHS - File Hierarchy Standard
 
+Norme de la la hiarchie des système de fichiers définit:
+   - l'arborescenece
+   - Le contenu des proncipaux répertoires des systèmes de fichiers
+
+
 
 F) Propiété des fichiers
 
+ - Les propriét
+
+
+
 G) Les droits d'accès
+
+[root@srvcentos7 ~]# ls -l /usr/bin/passwd
+-rwsr-xr-x. 1 root root 27856 Apr  1  2020 /usr/bin/passwd
+[root@srvcentos7 ~]# su - jm
+Last login: Tue Mar  8 14:16:29 CET 2022 from 192.168.203.117 on pts/1
+[jm@srvcentos7 ~]$ passwd
+Changing password for user jm.
+Changing password for jm.
+(current) UNIX password:
+[jm@srvcentos7 ~]$ exit
+logout
+[root@srvcentos7 ~]# su - jm
+Last login: Tue Mar  8 14:20:18 CET 2022 on pts/1
+[jm@srvcentos7 ~]$ touch f1
+[jm@srvcentos7 ~]$ ls -l f1
+-rw-rw-r--. 1 jm jm 0 Mar  8 14:22 f1
+[jm@srvcentos7 ~]$ exit
+logout
+[root@srvcentos7 ~]# chmod 4755 /home/jm/f1
+[root@srvcentos7 ~]# ls -l /home/jm/f1
+-rwsr-xr-x. 1 jm jm 0 Mar  8 14:22 /home/jm/f1
+[root@srvcentos7 ~]# groupadd net-admin
+[root@srvcentos7 ~]# usermod -a jm -G net-admin
+[root@srvcentos7 ~]# id jm
+uid=1000(jm) gid=1000(jm) groups=1000(jm),1001(net-admin)
+[root@srvcentos7 ~]# groupadd net-sys
+[root@srvcentos7 ~]# usermod -a jm -G net-sys
+[root@srvcentos7 ~]# mkdir file_pour_jm
+[root@srvcentos7 ~]# chown jm:net-sys file_pour_jm/
+[root@srvcentos7 ~]# ls -ld file_pour_jm/
+drwxr-xr-x. 2 jm net-sys 6 Mar  8 14:26 file_pour_jm/
+[root@srvcentos7 ~]# tocuh file_pour_jm/exec
+bash: tocuh: command not found...
+Similar command is: 'touch'
+[root@srvcentos7 ~]# touch file_pour_jm/exec
+[root@srvcentos7 ~]# chmod 755 file_pour_jm/exec
+[root@srvcentos7 ~]# ls -l file_pour_jm/
+total 0
+-rwxr-xr-x. 1 root root 0 Mar  8 14:27 exec
+[root@srvcentos7 ~]# chmod 2755 file_pour_jm/
+[root@srvcentos7 ~]# ls -l file_pour_jm/
+total 0
+-rwxr-xr-x. 1 root root 0 Mar  8 14:27 exec
+[root@srvcentos7 ~]# ls -ld file_pour_jm
+drwxr-sr-x. 2 jm net-sys 18 Mar  8 14:27 file_pour_jm
+[root@srvcentos7 ~]# touch file_pour_jm/exec2
+[root@srvcentos7 ~]# chmod 755 file_pour_jm/^C
+[root@srvcentos7 ~]# ls -l file_pour_jm/
+total 0
+-rwxr-xr-x. 1 root root    0 Mar  8 14:27 exec
+-rw-r--r--. 1 root net-sys 0 Mar  8 14:29 exec2
+[root@srvcentos7 ~]#
+
+
+
+
 
 H) Rechercher des fichiers
 
+-atime: date de dernier accès
+-mtime: date de dernière modification
+-ctime: date de création
+
+ 136  find /root -user jm
+  137  find /root -user jm -exec ls -l {} \;
+  138  find /root -user jm -exec  {} \;
+  139  find /root -user jm   {} \;
+  140  find / -user jm
+  141  find / -user jm >/dev/null
+  142  find / -user jm 2>/dev/null
+  143  find / -perm -400 2>/dev/null
+  144  find / -perm -4000  2>/dev/null
+  145  find / -perm -4000 -o -2000  2>/dev/null
+  146  find / -perm -4000 -o -perm -2000  2>/dev/null
+  147  find / -iname "f*" -a -user jm -exec cp {} /tmp/ \; 2>/dev/null
+  153  find / -iname "f*" -a -user jm -exec cp {} /tmp/ \; 2>/dev/null
+  155  history | grep find
+  157  history | grep find
+[root@srvcentos7 ~]#
+
+
+Gestion des processus
+----------------------
+
+top et ps
+
+
+- ps
+  
+- top
+u , puis taper le nom de l'user , il vas afficher que les processus de cet use, 
+u, entrer, vas remettre tout les processus
+f, on vas pouvoiur ajouter ou retirer des champ à top, et au meme endroit on peut avec "s" , sur le champ voulu trié a partir du champ voulu , par exemple si on veut trier sur la mémoire , on vas sur le champ mémoire , qu'on sélectionne et on tape "s" en haut on voit que top vas afficher la mémoire en priorité, exuite on fait "q" pour sortir.
