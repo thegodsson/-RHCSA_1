@@ -1,0 +1,140 @@
+[root@srvcentos7 ~]# df -h
+Filesystem           Size  Used Avail Use% Mounted on
+devtmpfs             227M     0  227M   0% /dev
+tmpfs                244M     0  244M   0% /dev/shm
+tmpfs                244M  5.5M  239M   3% /run
+tmpfs                244M     0  244M   0% /sys/fs/cgroup
+/dev/mapper/cl-root   18G  4.9G   14G  28% /
+/dev/sda1           1014M  223M  792M  22% /boot
+tmpfs                 49M   24K   49M   1% /run/user/1000
+/dev/sdb2            2.0G  6.0M  1.8G   1% /ext4_sdb2
+/dev/sdb1            3.9G   33M  3.9G   1% /xfs_sdb1
+[root@srvcentos7 ~]# mount  | grep sdb
+/dev/sdb2 on /ext4_sdb2 type ext4 (rw,relatime,seclabel,data=ordered)
+/dev/sdb1 on /xfs_sdb1 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+[root@srvcentos7 ~]# umount /ext4_sdb2
+[root@srvcentos7 ~]# fc
+fc           fc-cache     fc-cache-64  fc-cat       fc-conflist  fc-list      fc-match     fcnsq        fcoeadm      fcoemon      fc-pattern   fcping       fc-query     fcrls        fc-scan      fc-validate
+[root@srvcentos7 ~]# fsck
+fsck         fsck.btrfs   fsck.cramfs  fsck.ext2    fsck.ext3    fsck.ext4    fsck.fat     fsck.minix   fsck.msdos   fsck.vfat    fsck.xfs
+[root@srvcentos7 ~]# fsck.ext4 /dev/sdb2
+e2fsck 1.42.9 (28-Dec-2013)
+var: clean, 11/131072 files, 26156/524288 blocks
+[root@srvcentos7 ~]# fsck.ext4 -f /dev/sdb2
+e2fsck 1.42.9 (28-Dec-2013)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+var: 11/131072 files (0.0% non-contiguous), 26156/524288 blocks
+[root@srvcentos7 ~]# fsck.ext4 -fyv /dev/sdb2
+e2fsck 1.42.9 (28-Dec-2013)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+
+          11 inodes used (0.01%, out of 131072)
+           0 non-contiguous files (0.0%)
+           0 non-contiguous directories (0.0%)
+             # of inodes with ind/dind/tind blocks: 0/0/0
+             Extent depth histogram: 3
+       26156 blocks used (4.99%, out of 524288)
+           0 bad blocks
+           1 large file
+
+           0 regular files
+           2 directories
+           0 character device files
+           0 block device files
+           0 fifos
+           0 links
+           0 symbolic links (0 fast symbolic links)
+           0 sockets
+------------
+           2 files
+[root@srvcentos7 ~]# mount  | grep sdb
+/dev/sdb1 on /xfs_sdb1 type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+[root@srvcentos7 ~]# umount /xfs_sdb1
+[root@srvcentos7 ~]# xfs
+xfs_admin      xfs_copy       xfsdump        xfs_freeze     xfs_growfs     xfsinvutil     xfs_logprint   xfs_metadump   xfs_ncheck     xfs_repair     xfs_rtcp
+xfs_bmap       xfs_db         xfs_estimate   xfs_fsr        xfs_info       xfs_io         xfs_mdrestore  xfs_mkfile     xfs_quota      xfsrestore
+[root@srvcentos7 ~]# xfs_repair --help
+xfs_repair: invalid option -- '-'
+Usage: xfs_repair [options] device
+
+Options:
+  -f           The device is a file
+  -L           Force log zeroing. Do this as a last resort.
+  -l logdev    Specifies the device where the external log resides.
+  -m maxmem    Maximum amount of memory to be used in megabytes.
+  -n           No modify mode, just checks the filesystem for damage.
+  -P           Disables prefetching.
+  -r rtdev     Specifies the device where the realtime section resides.
+  -v           Verbose output.
+  -c subopts   Change filesystem parameters - use xfs_admin.
+  -o subopts   Override default behaviour, refer to man page.
+  -t interval  Reporting interval in seconds.
+  -d           Repair dangerously.
+  -V           Reports version and exits.
+[root@srvcentos7 ~]# xfs_repair -n /dev/sdb1
+Phase 1 - find and verify superblock...
+Phase 2 - using internal log
+        - zero log...
+        - scan filesystem freespace and inode maps...
+        - found root inode chunk
+Phase 3 - for each AG...
+        - scan (but don't clear) agi unlinked lists...
+        - process known inodes and perform inode discovery...
+        - agno = 0
+        - agno = 1
+        - agno = 2
+        - agno = 3
+        - process newly discovered inodes...
+Phase 4 - check for duplicate blocks...
+        - setting up duplicate extent list...
+        - check for inodes claiming duplicate blocks...
+        - agno = 0
+        - agno = 1
+        - agno = 2
+        - agno = 3
+No modify flag set, skipping phase 5
+Phase 6 - check inode connectivity...
+        - traversing filesystem ...
+        - traversal finished ...
+        - moving disconnected inodes to lost+found ...
+Phase 7 - verify link counts...
+No modify flag set, skipping filesystem flush and exiting.
+[root@srvcentos7 ~]# xfs_repair  /dev/sdb1
+Phase 1 - find and verify superblock...
+Phase 2 - using internal log
+        - zero log...
+        - scan filesystem freespace and inode maps...
+        - found root inode chunk
+Phase 3 - for each AG...
+        - scan and clear agi unlinked lists...
+        - process known inodes and perform inode discovery...
+        - agno = 0
+        - agno = 1
+        - agno = 2
+        - agno = 3
+        - process newly discovered inodes...
+Phase 4 - check for duplicate blocks...
+        - setting up duplicate extent list...
+        - check for inodes claiming duplicate blocks...
+        - agno = 0
+        - agno = 1
+        - agno = 2
+        - agno = 3
+Phase 5 - rebuild AG headers and trees...
+        - reset superblock...
+Phase 6 - check inode connectivity...
+        - resetting contents of realtime bitmap and summary inodes
+        - traversing filesystem ...
+        - traversal finished ...
+        - moving disconnected inodes to lost+found ...
+Phase 7 - verify and correct link counts...
+done
+[root@srvcentos7 ~]#
