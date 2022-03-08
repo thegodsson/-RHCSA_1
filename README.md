@@ -342,4 +342,326 @@ Usage: killall [-Z CONTEXT] [-u USER] [ -eIgiqrvw ] [ -SIGNAL ] NAME...
 [root@srvcentos7 ~]#
 
 
+
+GESTION DES SERVICES AVEC SYSTEMD
+----------------------------------
+
+Processus de démmarge architecture x86 :
+----------------------------------------
+
+- Le BIOS et L'UEFI
+- Grub: Grand Unified BootLoader
+- Initrd : InitialRamdisk
+- Systemd
+
+Systemd utilise comme pour sysinit le principe de niveau d'exécution
+
+
+Gérer les services avec Systemd
+---------------------------------
+
+systemd se base sur la notion d'unités:
+
+- systemd
+- les units de systemd
+[root@srvcentos7 ~]# systemctl list-units
+  UNIT                                                                                     LOAD   ACTIVE SUB       DESCRIPTION
+  proc-sys-fs-binfmt_misc.automount                                                        loaded active running   Arbitrary Executable File Formats File System Automount Point
+  sys-devices-pci0000:00-0000:00:01.1-ata2-host1-target1:0:0-1:0:0:0-block-sr0.device      loaded active plugged   VBOX_CD-ROM
+  sys-devices-pci0000:00-0000:00:03.0-net-enp0s3.device                                    loaded active plugged   82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+  sys-devices-pci0000:00-0000:00:05.0-sound-card0.device                                   loaded active plugged   82801AA AC'97 Audio Controller
+  sys-devices-pci0000:00-0000:00:0d.0-ata3-host2-target2:0:0-2:0:0:0-block-sda-sda1.device loaded active plugged   VBOX_HARDDISK 1
+  sys-devices-pci0000:00-0000:00:0d.0-ata3-host2-target2:0:0-2:0:0:0-block-sda-sda2.device loaded active plugged   VBOX_HARDDISK 2
+  sys-devices-pci0000:00-0000:00:0d.0-ata3-host2-target2:0:0-2:0:0:0-block-sda.device      loaded active plugged   VBOX_HARDDISK
+  sys-devices-pci0000:00-0000:00:0d.0-ata4-host3-target3:0:0-3:0:0:0-block-sdb-sdb1.device loaded active plugged   VBOX_HARDDISK VM
+  sys-devices-pci0000:00-0000:00:0d.0-ata4-host3-target3:0:0-3:0:0:0-block-sdb-sdb2.device loaded active plugged   VBOX_HARDDISK var
+  sys-devices-pci0000:00-0000:00:0d.0-ata4-host3-target3:0:0-3:0:0:0-block-sdb.device      loaded active plugged   VBOX_HARDDISK
+  sys-devices-platform-serial8250-tty-ttyS0.device                                         loaded active plugged   /sys/devices/platform/serial8250/tty/ttyS0
+  sys-devices-platform-serial8250-tty-ttyS1.device                                         loaded active plugged   /sys/devices/platform/serial8250/tty/ttyS1
+  sys-devices-platform-serial8250-tty-ttyS2.device                                         loaded active plugged   /sys/devices/platform/serial8250/tty/ttyS2
+  sys-devices-platform-serial8250-tty-ttyS3.device                                         loaded active plugged   /sys/devices/platform/serial8250/tty/ttyS3
+  sys-devices-virtual-block-dm\x2d0.device                                                 loaded active plugged   /sys/devices/virtual/block/dm-0
+  sys-devices-virtual-block-dm\x2d1.device                                                 loaded active plugged   /sys/devices/virtual/block/dm-1
+  sys-devices-virtual-net-virbr0.device                                                    loaded active plugged   /sys/devices/virtual/net/virbr0
+  sys-devices-virtual-net-virbr0\x2dnic.device                                             loaded active plugged   /sys/devices/virtual/net/virbr0-nic
+  sys-module-configfs.device                                                               loaded active plugged   /sys/module/configfs
+  sys-module-fuse.device                                                                   loaded active plugged   /sys/module/fuse
+  sys-subsystem-net-devices-enp0s3.device                                                  loaded active plugged   82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+  sys-subsystem-net-devices-virbr0.device                                                  loaded active plugged   /sys/subsystem/net/devices/virbr0
+  sys-subsystem-net-devices-virbr0\x2dnic.device                                           loaded active plugged   /sys/subsystem/net/devices/virbr0-nic
+● -.mount                                                                                  masked active mounted   -.mount
+● boot.mount                                                                               masked active mounted   boot.mount
+  dev-hugepages.mount                                                                      loaded active mounted   Huge Pages File System
+  dev-mqueue.mount                                                                         loaded active mounted   POSIX Message Queue File System
+  ext4_sdb2.mount                                                                          loaded active mounted   /ext4_sdb2
+  proc-sys-fs-binfmt_misc.mount                                                            loaded active mounted   Arbitrary Executable File Formats File System
+  run-user-1000-gvfs.mount                                                                 loaded active mounted   /run/user/1000/gvfs
+● run-user-1000.mount                                                                      masked active mounted   run-user-1000.mount
+  sys-fs-fuse-connections.mount                                                            loaded active mounted   FUSE Control File System
+  sys-kernel-config.mount                                                                  loaded active mounted   Configuration File System
+  sys-kernel-debug.mount                                                                   loaded active mounted   Debug File System
+● var-lib-nfs-rpc_pipefs.mount                                                             masked active mounted   var-lib-nfs-rpc_pipefs.mount
+  xfs_sdb1.mount                                                                           loaded active mounted   /xfs_sdb1
+  brandbot.path                                                                            loaded active waiting   Flexible branding
+  cups.path                                                                                loaded active waiting   CUPS Printer Service Spool
+  systemd-ask-password-plymouth.path                                                       loaded active waiting   Forward Password Requests to Plymouth Directory Watch
+  systemd-ask-password-wall.path                                                           loaded active waiting   Forward Password Requests to Wall Directory Watch
+  session-1.scope                                                                          loaded active running   Session 1 of user jm
+  session-17.scope                                                                         loaded active running   Session 17 of user jm
+  session-2.scope                                                                          loaded active running   Session 2 of user jm
+  abrt-ccpp.service                                                                        loaded active exited    Install ABRT coredump hook
+  abrt-oops.service                                                                        loaded active running   ABRT kernel log watcher
+  abrt-xorg.service                                                                        loaded active running   ABRT Xorg log watcher
+  abrtd.service                                                                            loaded active running   ABRT Automated Bug Reporting Tool
+  accounts-daemon.service                                                                  loaded active running   Accounts Service
+  alsa-state.service                                                                       loaded active running   Manage Sound Card State (restore and store)
+  atd.service                                                                              loaded active running   Job spooling tools
+  auditd.service                                                                           loaded active running   Security Auditing Service
+  avahi-daemon.service                                                                     loaded active running   Avahi mDNS/DNS-SD Stack
+  blk-availability.service                                                                 loaded active exited    Availability of block devices
+  bolt.service                                                                             loaded active running   Thunderbolt system service
+  colord.service                                                                           loaded active running   Manage, Install and Generate Color Profiles
+  crond.service                                                                            loaded active running   Command Scheduler
+  cups.service                                                                             loaded active running   CUPS Printing Service
+  dbus.service                                                                             loaded active running   D-Bus System Message Bus
+  firewalld.service                                                                        loaded active running   firewalld - dynamic firewall daemon
+  fwupd.service                                                                            loaded active running   Firmware update daemon
+  gdm.service                                                                              loaded active running   GNOME Display Manager
+  gssproxy.service                                                                         loaded active running   GSSAPI Proxy Daemon
+  iscsi-shutdown.service                                                                   loaded active exited    Logout off all iSCSI sessions on shutdown
+● kdump.service                                                                            loaded failed failed    Crash recovery kernel arming
+  kmod-static-nodes.service                                                                loaded active exited    Create list of required static device nodes for the current kernel
+  ksm.service                                                                              loaded active exited    Kernel Samepage Merging
+  ksmtuned.service                                                                         loaded active running   Kernel Samepage Merging (KSM) Tuning Daemon
+  libstoragemgmt.service                                                                   loaded active running   libstoragemgmt plug-in server daemon
+  libvirtd.service                                                                         loaded active running   Virtualization daemon
+  lvm2-lvmetad.service                                                                     loaded active running   LVM2 metadata daemon
+  lvm2-monitor.service                                                                     loaded active exited    Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling
+  lvm2-pvscan@8:2.service                                                                  loaded active exited    LVM2 PV scan on device 8:2
+  mcelog.service                                                                           loaded active running   Machine Check Exception Logging Daemon
+  ModemManager.service                                                                     loaded active running   Modem Manager
+  netcf-transaction.service                                                                loaded active exited    Rollback uncommitted netcf network config change transactions
+  network.service                                                                          loaded active exited    LSB: Bring up/down networking
+  NetworkManager-wait-online.service                                                       loaded active exited    Network Manager Wait Online
+  NetworkManager.service                                                                   loaded active running   Network Manager
+  packagekit.service                                                                       loaded active running   PackageKit Daemon
+  polkit.service                                                                           loaded active running   Authorization Manager
+  postfix.service                                                                          loaded active running   Postfix Mail Transport Agent
+  rhel-dmesg.service                                                                       loaded active exited    Dump dmesg to /var/log/dmesg
+  rhel-domainname.service                                                                  loaded active exited    Read and set NIS domainname from /etc/sysconfig/network
+  rhel-import-state.service                                                                loaded active exited    Import network configuration from initramfs
+  rhel-readonly.service                                                                    loaded active exited    Configure read-only root support
+  rngd.service                                                                             loaded active running   Hardware RNG Entropy Gatherer Daemon
+  rsyslog.service                                                                          loaded active running   System Logging Service
+  rtkit-daemon.service                                                                     loaded active running   RealtimeKit Scheduling Policy Service
+  smartd.service                                                                           loaded active running   Self Monitoring and Reporting Technology (SMART) Daemon
+  sshd.service                                                                             loaded active running   OpenSSH server daemon
+  sysstat.service                                                                          loaded active exited    Resets System Activity Logs
+  systemd-journal-flush.service                                                            loaded active exited    Flush Journal to Persistent Storage
+  systemd-journald.service                                                                 loaded active running   Journal Service
+  systemd-logind.service                                                                   loaded active running   Login Service
+  systemd-modules-load.service                                                             loaded active exited    Load Kernel Modules
+  systemd-random-seed.service                                                              loaded active exited    Load/Save Random Seed
+  systemd-remount-fs.service                                                               loaded active exited    Remount Root and Kernel File Systems
+  systemd-sysctl.service                                                                   loaded active exited    Apply Kernel Variables
+  systemd-tmpfiles-setup-dev.service                                                       loaded active exited    Create Static Device Nodes in /dev
+  systemd-tmpfiles-setup.service                                                           loaded active exited    Create Volatile Files and Directories
+  systemd-udev-settle.service                                                              loaded active exited    udev Wait for Complete Device Initialization
+  systemd-udev-trigger.service                                                             loaded active exited    udev Coldplug all Devices
+  systemd-udevd.service                                                                    loaded active running   udev Kernel Device Manager
+  systemd-update-utmp.service                                                              loaded active exited    Update UTMP about System Boot/Shutdown
+  systemd-user-sessions.service                                                            loaded active exited    Permit User Sessions
+  systemd-vconsole-setup.service                                                           loaded active exited    Setup Virtual Console
+  tuned.service                                                                            loaded active running   Dynamic System Tuning Daemon
+  udisks2.service                                                                          loaded active running   Disk Manager
+  upower.service                                                                           loaded active running   Daemon for power management
+  wpa_supplicant.service                                                                   loaded active running   WPA Supplicant daemon
+  -.slice                                                                                  loaded active active    Root Slice
+  machine.slice                                                                            loaded active active    Virtual Machine and Container Slice
+  system-getty.slice                                                                       loaded active active    system-getty.slice
+  system-lvm2\x2dpvscan.slice                                                              loaded active active    system-lvm2\x2dpvscan.slice
+  system-selinux\x2dpolicy\x2dmigrate\x2dlocal\x2dchanges.slice                            loaded active active    system-selinux\x2dpolicy\x2dmigrate\x2dlocal\x2dchanges.slice
+  system.slice                                                                             loaded active active    System Slice
+  user-1000.slice                                                                          loaded active active    User Slice of jm
+  user.slice                                                                               loaded active active    User and Session Slice
+  avahi-daemon.socket                                                                      loaded active running   Avahi mDNS/DNS-SD Stack Activation Socket
+  cups.socket                                                                              loaded active running   CUPS Printing Service Sockets
+  dbus.socket                                                                              loaded active running   D-Bus System Message Bus Socket
+  dm-event.socket                                                                          loaded active listening Device-mapper event daemon FIFOs
+  iscsid.socket                                                                            loaded active listening Open-iSCSI iscsid Socket
+  iscsiuio.socket                                                                          loaded active listening Open-iSCSI iscsiuio Socket
+  lvm2-lvmetad.socket                                                                      loaded active running   LVM2 metadata daemon socket
+  lvm2-lvmpolld.socket                                                                     loaded active listening LVM2 poll daemon socket
+  rpcbind.socket                                                                           loaded active listening RPCbind Server Activation Socket
+  systemd-initctl.socket                                                                   loaded active listening /dev/initctl Compatibility Named Pipe
+  systemd-journald.socket                                                                  loaded active running   Journal Socket
+  systemd-shutdownd.socket                                                                 loaded active listening Delayed Shutdown Socket
+  systemd-udevd-control.socket                                                             loaded active running   udev Control Socket
+  systemd-udevd-kernel.socket                                                              loaded active running   udev Kernel Socket
+  virtlockd.socket                                                                         loaded active listening Virtual machine lock manager socket
+  virtlogd.socket                                                                          loaded active listening Virtual machine log manager socket
+  dev-mapper-cl\x2dswap.swap                                                               loaded active active    /dev/mapper/cl-swap
+  basic.target                                                                             loaded active active    Basic System
+  cryptsetup.target                                                                        loaded active active    Local Encrypted Volumes
+  getty.target                                                                             loaded active active    Login Prompts
+  graphical.target                                                                         loaded active active    Graphical Interface
+  local-fs-pre.target                                                                      loaded active active    Local File Systems (Pre)
+  local-fs.target                                                                          loaded active active    Local File Systems
+  multi-user.target                                                                        loaded active active    Multi-User System
+  network-online.target                                                                    loaded active active    Network is Online
+  network-pre.target                                                                       loaded active active    Network (Pre)
+  network.target                                                                           loaded active active    Network
+  nfs-client.target                                                                        loaded active active    NFS client services
+  nss-user-lookup.target                                                                   loaded active active    User and Group Name Lookups
+  paths.target                                                                             loaded active active    Paths
+  remote-fs-pre.target                                                                     loaded active active    Remote File Systems (Pre)
+  remote-fs.target                                                                         loaded active active    Remote File Systems
+  rpc_pipefs.target                                                                        loaded active active    rpc_pipefs.target
+  slices.target                                                                            loaded active active    Slices
+  sockets.target                                                                           loaded active active    Sockets
+  sound.target                                                                             loaded active active    Sound Card
+  swap.target                                                                              loaded active active    Swap
+  sysinit.target                                                                           loaded active active    System Initialization
+  timers.target                                                                            loaded active active    Timers
+  systemd-tmpfiles-clean.timer                                                             loaded active waiting   Daily Cleanup of Temporary Directories
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+
+158 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+- Gestion des services
+- Gestions de cibles (target), gérer les niveaux d'éxécution
+[root@srvcentos7 ~]# ls -l /etc/systemd/
+total 28
+-rw-r--r--.  1 root root  720 Jan 13 17:54 bootchart.conf
+-rw-r--r--.  1 root root  615 Jan 13 17:54 coredump.conf
+-rw-r--r--.  1 root root  983 Jan 13 17:54 journald.conf
+-rw-r--r--.  1 root root  957 Jan 13 17:54 logind.conf
+drwxr-xr-x. 17 root root 4096 Feb 28 12:23 system
+-rw-r--r--.  1 root root 1552 Jan 13 17:54 system.conf
+drwxr-xr-x.  2 root root    6 Jan 13 17:54 user
+-rw-r--r--.  1 root root 1127 Jan 13 17:54 user.conf
+[root@srvcentos7 ~]# ls -l /etc/systemd/system
+total 8
+drwxr-xr-x. 2 root root   82 Feb 28 12:23 basic.target.wants
+drwxr-xr-x. 2 root root   31 Feb 28 11:02 bluetooth.target.wants
+lrwxrwxrwx. 1 root root   41 Feb 28 11:02 dbus-org.bluez.service -> /usr/lib/systemd/system/bluetooth.service
+lrwxrwxrwx. 1 root root   41 Feb 28 11:02 dbus-org.fedoraproject.FirewallD1.service -> /usr/lib/systemd/system/firewalld.service
+lrwxrwxrwx. 1 root root   44 Feb 28 11:10 dbus-org.freedesktop.Avahi.service -> /usr/lib/systemd/system/avahi-daemon.service
+lrwxrwxrwx. 1 root root   44 Feb 28 11:11 dbus-org.freedesktop.ModemManager1.service -> /usr/lib/systemd/system/ModemManager.service
+lrwxrwxrwx. 1 root root   46 Feb 28 11:02 dbus-org.freedesktop.NetworkManager.service -> /usr/lib/systemd/system/NetworkManager.service
+lrwxrwxrwx. 1 root root   57 Feb 28 11:02 dbus-org.freedesktop.nm-dispatcher.service -> /usr/lib/systemd/system/NetworkManager-dispatcher.service
+lrwxrwxrwx. 1 root root   36 Feb 28 11:24 default.target -> /lib/systemd/system/graphical.target
+drwxr-xr-x. 2 root root   87 Feb 28 11:00 default.target.wants
+drwxr-xr-x. 2 root root   38 Feb 28 11:11 dev-virtio\x2dports-org.qemu.guest_agent.0.device.wants
+lrwxrwxrwx. 1 root root   35 Feb 28 11:07 display-manager.service -> /usr/lib/systemd/system/gdm.service
+drwxr-xr-x. 2 root root   32 Feb 28 11:00 getty.target.wants
+drwxr-xr-x. 2 root root   65 Feb 28 11:28 graphical.target.wants
+drwxr-xr-x. 2 root root   35 Feb 28 12:23 local-fs.target.wants
+drwxr-xr-x. 2 root root 4096 Feb 28 12:23 multi-user.target.wants
+drwxr-xr-x. 2 root root   48 Feb 28 12:12 network-online.target.wants
+drwxr-xr-x. 2 root root   26 Feb 28 11:08 printer.target.wants
+drwxr-xr-x. 2 root root   31 Feb 28 11:03 remote-fs.target.wants
+drwxr-xr-x. 2 root root  188 Feb 28 11:10 sockets.target.wants
+drwxr-xr-x. 2 root root   36 Feb 28 11:10 spice-vdagentd.target.wants
+drwxr-xr-x. 2 root root 4096 Feb 28 12:23 sysinit.target.wants
+drwxr-xr-x. 2 root root   44 Feb 28 11:00 system-update.target.wants
+[root@srvcentos7 ~]# ls -l /etc/systemd/system/multi-user.target.wants/
+total 0
+lrwxrwxrwx. 1 root root 41 Feb 28 11:03 abrt-ccpp.service -> /usr/lib/systemd/system/abrt-ccpp.service
+lrwxrwxrwx. 1 root root 37 Feb 28 11:01 abrtd.service -> /usr/lib/systemd/system/abrtd.service
+lrwxrwxrwx. 1 root root 41 Feb 28 11:01 abrt-oops.service -> /usr/lib/systemd/system/abrt-oops.service
+lrwxrwxrwx. 1 root root 43 Feb 28 11:02 abrt-vmcore.service -> /usr/lib/systemd/system/abrt-vmcore.service
+lrwxrwxrwx. 1 root root 41 Feb 28 11:02 abrt-xorg.service -> /usr/lib/systemd/system/abrt-xorg.service
+lrwxrwxrwx. 1 root root 35 Feb 28 11:11 atd.service -> /usr/lib/systemd/system/atd.service
+lrwxrwxrwx. 1 root root 38 Feb 28 11:03 auditd.service -> /usr/lib/systemd/system/auditd.service
+lrwxrwxrwx. 1 root root 44 Feb 28 11:10 avahi-daemon.service -> /usr/lib/systemd/system/avahi-daemon.service
+lrwxrwxrwx. 1 root root 37 Feb 28 12:23 brandbot.path -> /usr/lib/systemd/system/brandbot.path
+lrwxrwxrwx. 1 root root 37 Feb 28 11:01 crond.service -> /usr/lib/systemd/system/crond.service
+lrwxrwxrwx. 1 root root 33 Feb 28 11:08 cups.path -> /usr/lib/systemd/system/cups.path
+lrwxrwxrwx. 1 root root 36 Feb 28 11:08 cups.service -> /usr/lib/systemd/system/cups.service
+lrwxrwxrwx. 1 root root 42 Feb 28 11:11 irqbalance.service -> /usr/lib/systemd/system/irqbalance.service
+lrwxrwxrwx. 1 root root 37 Feb 28 11:02 kdump.service -> /usr/lib/systemd/system/kdump.service
+lrwxrwxrwx. 1 root root 35 Feb 28 11:03 ksm.service -> /usr/lib/systemd/system/ksm.service
+lrwxrwxrwx. 1 root root 40 Feb 28 11:03 ksmtuned.service -> /usr/lib/systemd/system/ksmtuned.service
+lrwxrwxrwx. 1 root root 46 Feb 28 11:02 libstoragemgmt.service -> /usr/lib/systemd/system/libstoragemgmt.service
+lrwxrwxrwx. 1 root root 40 Feb 28 11:03 libvirtd.service -> /usr/lib/systemd/system/libvirtd.service
+lrwxrwxrwx. 1 root root 38 Feb 28 11:11 mcelog.service -> /usr/lib/systemd/system/mcelog.service
+lrwxrwxrwx. 1 root root 41 Feb 28 11:02 mdmonitor.service -> /usr/lib/systemd/system/mdmonitor.service
+lrwxrwxrwx. 1 root root 44 Feb 28 11:11 ModemManager.service -> /usr/lib/systemd/system/ModemManager.service
+lrwxrwxrwx. 1 root root 49 Feb 28 12:07 netcf-transaction.service -> /usr/lib/systemd/system/netcf-transaction.service
+lrwxrwxrwx. 1 root root 46 Feb 28 11:02 NetworkManager.service -> /usr/lib/systemd/system/NetworkManager.service
+lrwxrwxrwx. 1 root root 41 Feb 28 11:03 nfs-client.target -> /usr/lib/systemd/system/nfs-client.target
+lrwxrwxrwx. 1 root root 39 Feb 28 11:11 postfix.service -> /usr/lib/systemd/system/postfix.service
+lrwxrwxrwx. 1 root root 40 Feb 28 11:00 remote-fs.target -> /usr/lib/systemd/system/remote-fs.target
+lrwxrwxrwx. 1 root root 46 Feb 28 12:23 rhel-configure.service -> /usr/lib/systemd/system/rhel-configure.service
+lrwxrwxrwx. 1 root root 36 Feb 28 11:11 rngd.service -> /usr/lib/systemd/system/rngd.service
+lrwxrwxrwx. 1 root root 39 Feb 28 11:10 rsyslog.service -> /usr/lib/systemd/system/rsyslog.service
+lrwxrwxrwx. 1 root root 38 Feb 28 11:11 smartd.service -> /usr/lib/systemd/system/smartd.service
+lrwxrwxrwx. 1 root root 36 Feb 28 11:10 sshd.service -> /usr/lib/systemd/system/sshd.service
+lrwxrwxrwx. 1 root root 39 Feb 28 11:10 sysstat.service -> /usr/lib/systemd/system/sysstat.service
+lrwxrwxrwx. 1 root root 37 Feb 28 11:10 tuned.service -> /usr/lib/systemd/system/tuned.service
+lrwxrwxrwx. 1 root root 40 Feb 28 11:03 vmtoolsd.service -> /usr/lib/systemd/system/vmtoolsd.service
+[root@srvcentos7 ~]# ls -l /etc/systemd/system/
+basic.target.wants/                                      dbus-org.freedesktop.NetworkManager.service              getty.target.wants/                                      remote-fs.target.wants/
+bluetooth.target.wants/                                  dbus-org.freedesktop.nm-dispatcher.service               graphical.target.wants/                                  sockets.target.wants/
+dbus-org.bluez.service                                   default.target                                           local-fs.target.wants/                                   spice-vdagentd.target.wants/
+dbus-org.fedoraproject.FirewallD1.service                default.target.wants/                                    multi-user.target.wants/                                 sysinit.target.wants/
+dbus-org.freedesktop.Avahi.service                       dev-virtio\x2dports-org.qemu.guest_agent.0.device.wants/ network-online.target.wants/                             system-update.target.wants/
+dbus-org.freedesktop.ModemManager1.service               display-manager.service                                  printer.target.wants/
+[root@srvcentos7 ~]# ls -l /etc/systemd/system/basic.target.wants/
+total 0
+lrwxrwxrwx. 1 root root 41 Feb 28 11:02 firewalld.service -> /usr/lib/systemd/system/firewalld.service
+lrwxrwxrwx. 1 root root 41 Feb 28 11:11 microcode.service -> /usr/lib/systemd/system/microcode.service
+lrwxrwxrwx. 1 root root 42 Feb 28 12:23 rhel-dmesg.service -> /usr/lib/systemd/system/rhel-dmesg.service
+
+
+Chaque service vas se basé sur le service précédent pour démmarer un eput le voir dans:
+
+[root@srvcentos7 ~]# vi /usr/lib/systemd/system/
+
+
+exemple: le mode graphique
+
+[root@srvcentos7 ~]# cat /usr/lib/systemd/system/graphical.target
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=Graphical Interface
+Documentation=man:systemd.special(7)
+Requires=multi-user.target
+Wants=display-manager.service
+Conflicts=rescue.service rescue.target
+After=multi-user.target rescue.service rescue.target display-manager.service
+AllowIsolate=yes
+[root@srvcentos7 ~]#
+
+Il vas démmaré que si le mode si le mode multi utilisateur est démmaré et il vas démmaré après ce mode
+
+
+
+- le type service : estions de démons
+- le type target : regroupe plusieurs unités et permet de définir le niveau d'éxécution
+
+
+-  le type mount : gestion des systèmes de fichier en relation avec fstab
+-  le type snapshot : permet de sauvegarder et de restaurer l'état des services.
+
+
+
+
+
+
+
+
+
+
    
