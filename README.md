@@ -1023,6 +1023,209 @@ Packages Altered:
     Dep-Install httpd-tools-2.4.6-97.el7.centos.4.x86_64 @updates
     Dep-Install mailcap-2.1.41-2.el7.noarch              @base
 history info
+   
+   
+[root@Host-002 rpms]# yum history repeat 4
+Loaded plugins: fastestmirror, langpacks
+Repeating transaction 4, from Wed Mar  9 05:20:14 2022
+    Install httpd-2.4.6-97.el7.centos.4.x86_64 @updates
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Package httpd-2.4.6-97.el7.centos.4.x86_64 already installed and latest version
+history repeat
+[root@Host-002 rpms]# yum remove -y httpd
+Loaded plugins: fastestmirror, langpacks
+Resolving Dependencies
+--> Running transaction check
+---> Package httpd.x86_64 0:2.4.6-97.el7.centos.4 will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                     Arch                         Version                                       Repository                      Size
+=============================================================================================================================================
+Removing:
+ httpd                       x86_64                       2.4.6-97.el7.centos.4                         @updates                       9.4 M
+
+Transaction Summary
+=============================================================================================================================================
+Remove  1 Package
+
+Installed size: 9.4 M
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Erasing    : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+  Verifying  : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+
+Removed:
+  httpd.x86_64 0:2.4.6-97.el7.centos.4
+
+Complete!
+[root@Host-002 rpms]# yum history repeat 4
+Loaded plugins: fastestmirror, langpacks
+Repeating transaction 4, from Wed Mar  9 05:20:14 2022
+    Install httpd-2.4.6-97.el7.centos.4.x86_64 @updates
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Resolving Dependencies
+--> Running transaction check
+---> Package httpd.x86_64 0:2.4.6-97.el7.centos.4 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                     Arch                         Version                                        Repository                     Size
+=============================================================================================================================================
+Installing:
+ httpd                       x86_64                       2.4.6-97.el7.centos.4                          updates                       2.7 M
+
+Transaction Summary
+=============================================================================================================================================
+Install  1 Package
+
+Total download size: 2.7 M
+Installed size: 9.4 M
+Is this ok [y/d/N]: y
+Downloading packages:
+httpd-2.4.6-97.el7.centos.4.x86_64.rpm                                                                                | 2.7 MB  00:00:02
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+  Verifying  : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+
+Installed:
+  httpd.x86_64 0:2.4.6-97.el7.centos.4
+
+Complete!
+[root@Host-002 rpms]#
+
+   
+   
+[root@Host-002 rpms]# yum history undo 4
+Loaded plugins: fastestmirror, langpacks
+Undoing transaction 4, from Wed Mar  9 05:20:14 2022
+    Install httpd-2.4.6-97.el7.centos.4.x86_64 @updates
+Resolving Dependencies
+--> Running transaction check
+---> Package httpd.x86_64 0:2.4.6-97.el7.centos.4 will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                     Arch                         Version                                       Repository                      Size
+=============================================================================================================================================
+Removing:
+ httpd                       x86_64                       2.4.6-97.el7.centos.4                         @updates                       9.4 M
+
+Transaction Summary
+=============================================================================================================================================
+Remove  1 Package
+
+Installed size: 9.4 M
+Is this ok [y/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Erasing    : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+  Verifying  : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+
+Removed:
+  httpd.x86_64 0:2.4.6-97.el7.centos.4
+
+Complete!
+[root@Host-002 rpms]# yum history list
+Loaded plugins: fastestmirror, langpacks
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+     7 | jm <jm>                  | 2022-03-09 05:23 | Erase          |    1
+     6 | jm <jm>                  | 2022-03-09 05:21 | Install        |    1
+     5 | jm <jm>                  | 2022-03-09 05:21 | Erase          |    1
+     4 | jm <jm>                  | 2022-03-09 05:20 | Install        |    1
+     3 | jm <jm>                  | 2022-03-09 05:19 | Erase          |    1
+     2 | jm <jm>                  | 2022-03-09 05:12 | Install        |    5  <
+     1 | System <unset>           | 2022-03-08 11:57 | Install        | 1257 >
+history list
+[root@Host-002 rpms]# yum history repeat 4
+Loaded plugins: fastestmirror, langpacks
+Repeating transaction 4, from Wed Mar  9 05:20:14 2022
+    Install httpd-2.4.6-97.el7.centos.4.x86_64 @updates
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Resolving Dependencies
+--> Running transaction check
+---> Package httpd.x86_64 0:2.4.6-97.el7.centos.4 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                     Arch                         Version                                        Repository                     Size
+=============================================================================================================================================
+Installing:
+ httpd                       x86_64                       2.4.6-97.el7.centos.4                          updates                       2.7 M
+
+Transaction Summary
+=============================================================================================================================================
+Install  1 Package
+
+Total download size: 2.7 M
+Installed size: 9.4 M
+Is this ok [y/d/N]: y
+Downloading packages:
+httpd-2.4.6-97.el7.centos.4.x86_64.rpm                                                                                | 2.7 MB  00:00:02
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+  Verifying  : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        1/1
+
+Installed:
+  httpd.x86_64 0:2.4.6-97.el7.centos.4
+
+Complete!
+[root@Host-002 rpms]#
+
+   
+   
+[root@Host-002 rpms]# yum history list
+Loaded plugins: fastestmirror, langpacks
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+     8 | jm <jm>                  | 2022-03-09 05:23 | Install        |    1
+     7 | jm <jm>                  | 2022-03-09 05:23 | Erase          |    1
+     6 | jm <jm>                  | 2022-03-09 05:21 | Install        |    1
+     5 | jm <jm>                  | 2022-03-09 05:21 | Erase          |    1
+     4 | jm <jm>                  | 2022-03-09 05:20 | Install        |    1
+     3 | jm <jm>                  | 2022-03-09 05:19 | Erase          |    1
+     2 | jm <jm>                  | 2022-03-09 05:12 | Install        |    5  <
+     1 | System <unset>           | 2022-03-08 11:57 | Install        | 1257 >
+history list
+[root@Host-002 rpms]# yum history new
+Loaded plugins: fastestmirror, langpacks
+history new
+[root@Host-002 rpms]# yum history list
+Loaded plugins: fastestmirror, langpacks
+No transactions
+Error: Failed history list
+[root@Host-002 rpms]#
+
 [root@Host-002 rpms]#
 
 
@@ -1030,6 +1233,287 @@ history info
 [root@Host-002 rpms]#
 
 - Manipulation des groupes avec Yum
+   
+  Offre la gestion ds groupes de paquet:
+   - Grouplist: Lister les groupes
+     yum group list ou yum groups list
+   
+   - Groupinfo: Fournit les infs sur les groupe
+   yum groupinfo "virtualization-hypervisor"    yum groups info
+   
+   - Groupinstall: Installe un groupe:
+   
+   yum groupinstall "virtualization-hypervisor"
+   
+   - Groupremove: Supprime un groupe
+   yum groupremove "virtualization-hypervisor"
+   
+   - Groupupdate: Mets a jour legroupe
+   yum groupupdate "virtualization-hypervisor"
+   
+   
+   
+Les Dépôts logiciels
+----------------------
+   
+A) Qu'est-ce q'un dépôt ?
+   YUM télécharge les RPM du logiciel et ses dépendances à partir des serveurs
+   Ces serveurs sont des dépôt logiciels:
+    - Ils contiennent yne liste de logiciels disponibles
+    - Ces dépôts peuvent être signés
+    - La liste des dépôts se trouve sous /etc/yu.repos.d/
+   
+   exemple:
+   [root@Host-002 rpms]# cat /etc/yum.repos.d/CentOS-Base.repo
+# CentOS-Base.repo
+#
+# The mirror system uses the connecting IP address of the client and the
+# update status of each mirror to pick mirrors that are updated to and
+# geographically close to the client.  You should use this for CentOS updates
+# unless you are manually picking other mirrors.
+#
+# If the mirrorlist= does not work for you, as a fall back you can try the
+# remarked out baseurl= line instead.
+#
+#
+
+[base]
+name=CentOS-$releasever - Base
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#released updates
+[updates]
+name=CentOS-$releasever - Updates
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#additional packages that may be useful
+[extras]
+name=CentOS-$releasever - Extras
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=extras&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/extras/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=CentOS-$releasever - Plus
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/centosplus/$basearch/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+   
+   
+B) Crer son dépôt
+   mkdir /srv/jm.repo/7server/x86_64
+   cp /Packages/* /srv/jm.repo/7server/x86_64
+   
+   création du fichier jm.repo:
+   
+   [jm-repo-CENTOS7]
+   name = JM CENTOS7
+   baseurl = file:///srv/jm.repo/$releasever/$basearch/
+   enabled = 1
+   gpgcheck = 1
+   gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centos-release
+   
+   Mise en place:
+   
+   1) connaitre les infos précise sur notre repo:
+   [root@Host-002 rpms]# python -c 'import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)'
+Loaded plugins: fastestmirror, langpacks
+{'arch': 'ia32e',
+ 'basearch': 'x86_64',
+ 'infra': 'stock',
+ 'releasever': '7',
+ 'uuid': '3fdacb92-271e-4fe0-9504-cb6be5e0bc89'}
+[root@Host-002 rpms]#
+
+   2) Mettre le dvd dans virtual box
+   
+   [root@Host-002 rpms]# ls -l /dev/ -l | grep dvd
+[root@Host-002 rpms]# ls -l /dev/ -l | grep cd
+lrwxrwxrwx. 1 root root           3 Mar  9 06:11 cdrom -> sr0
+crw-rw----. 1 root cdrom    21,   1 Mar  9 04:15 sg1
+brw-rw----. 1 root cdrom    11,   0 Mar  9 06:11 sr0
+[root@Host-002 rpms]# ls -l /dev/cdrom
+lrwxrwxrwx. 1 root root 3 Mar  9 06:11 /dev/cdrom -> sr0
+[root@Host-002 rpms]# ls -l /dev/sr0
+brw-rw----. 1 root cdrom 11, 0 Mar  9 06:11 /dev/sr0
+[root@Host-002 rpms]# mount -r -t iso9660 /dev/sr0 /mnt/iso
+[root@Host-002 rpms]# df -h
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/mapper/cl-root   17G  4.8G   13G  29% /
+devtmpfs             481M     0  481M   0% /dev
+tmpfs                497M     0  497M   0% /dev/shm
+tmpfs                497M  7.0M  490M   2% /run
+tmpfs                497M     0  497M   0% /sys/fs/cgroup
+/dev/sda1           1014M  212M  803M  21% /boot
+tmpfs                100M     0  100M   0% /run/user/1000
+/dev/sr0             4.1G  4.1G     0 100% /mnt/iso
+[root@Host-002 rpms]# ls -l /mnt/iso/
+total 654
+-rw-r--r--. 1 root root     14 Dec  5  2016 CentOS_BuildTag
+drwxr-xr-x. 3 root root   2048 Dec  5  2016 EFI
+-rw-r--r--. 1 root root    215 Dec  9  2015 EULA
+-rw-r--r--. 1 root root  18009 Dec  9  2015 GPL
+drwxr-xr-x. 3 root root   2048 Dec  5  2016 images
+drwxr-xr-x. 2 root root   2048 Dec  5  2016 isolinux
+drwxr-xr-x. 2 root root   2048 Dec  5  2016 LiveOS
+drwxrwxr-x. 2 root root 630784 Dec  5  2016 Packages
+drwxrwxr-x. 2 root root   4096 Dec  5  2016 repodata
+-rw-r--r--. 1 root root   1690 Dec  9  2015 RPM-GPG-KEY-CentOS-7
+-rw-r--r--. 1 root root   1690 Dec  9  2015 RPM-GPG-KEY-CentOS-Testing-7
+-r--r--r--. 1 root root   2883 Dec  5  2016 TRANS.TBL
+[root@Host-002 rpms]#
+
+   
+3) Copier les données:
+   
+ cp -rP /mnt/iso/Packages/* /srv/jm.repo/7/x86_64/
+   
+ cp /mnt/iso/RPM-GPG-KEY-CentOS-7 /etc/pki/rpm-gpg/
+   
+ 4) On creé le repo:
+  createrepo /srv/jm.repo/7/x86_64/
+   
+ 5) On configure le fichier dans yum.repo.d
+   
+   [root@Host-002 yum.repos.d]# cat /etc/yum.repos.d/jm.repo
+[jm-repo-CENTOS7]
+name = JM CENTOS7
+baseurl = file:///srv/jm.repo/$releasever/$basearch/
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+[root@Host-002 yum.repos.d]#
+
+[root@Host-002 yum.repos.d]# yum repolist
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: centos.mirror.fr.planethoster.net
+ * extras: ftp.pasteur.fr
+ * updates: mirrors.ircam.fr
+repo id                                                               repo name                                                        status
+base/7/x86_64                                                         CentOS-7 - Base                                                  10,072
+extras/7/x86_64                                                       CentOS-7 - Extras                                                   509
+jm-repo-CENTOS7/7/x86_64                                              JM CENTOS7                                                        3,831
+updates/7/x86_64                                                      CentOS-7 - Updates                                                3,570
+repolist: 17,982
+
+   
+ CEpendant il n'y a pas de priorité, on vas faire en sorte que notre repo soit prioritaire:
+   
+ yum install yum-plugin-priorities
+  
+ [root@Host-002 yum.repos.d]# cat /etc/yum/pluginconf.d/priorities.conf
+[main]
+enabled = 1
+
+   
+On rajoute la priorité 1 sur notre repo:
+
+[root@Host-002 yum.repos.d]# cat /etc/yum.repos.d/jm.repo
+[jm-repo-CENTOS7]
+name = JM CENTOS7
+priority = 1
+baseurl = file:///srv/jm.repo/$releasever/$basearch/
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+ Et on test:
+   
+ [root@Host-002 yum.repos.d]# yum install tcpdump
+Loaded plugins: fastestmirror, langpacks, priorities
+jm-repo-CENTOS7                                                                                                       | 2.9 kB  00:00:00
+Loading mirror speeds from cached hostfile
+ * base: centos.mirror.fr.planethoster.net
+ * extras: ftp.pasteur.fr
+ * updates: mirrors.ircam.fr
+6980 packages excluded due to repository priority protections
+Resolving Dependencies
+--> Running transaction check
+---> Package tcpdump.x86_64 14:4.5.1-3.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                       Arch                         Version                              Repository                             Size
+=============================================================================================================================================
+Installing:
+ tcpdump                       x86_64                       14:4.5.1-3.el7                       jm-repo-CENTOS7                       387 k
+
+Transaction Summary
+=============================================================================================================================================
+Install  1 Package
+
+Total download size: 387 k
+Installed size: 931 k
+Is this ok [y/d/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : 14:tcpdump-4.5.1-3.el7.x86_64                                                                                             1/1
+  Verifying  : 14:tcpdump-4.5.1-3.el7.x86_64                                                                                             1/1
+
+Installed:
+  tcpdump.x86_64 14:4.5.1-3.el7
+
+Complete!
+   
+   
+   
+[root@Host-002 yum.repos.d]# yum info tcpdump
+Loaded plugins: fastestmirror, langpacks, priorities
+Loading mirror speeds from cached hostfile
+ * base: centos.mirror.fr.planethoster.net
+ * extras: ftp.pasteur.fr
+ * updates: mirrors.ircam.fr
+6980 packages excluded due to repository priority protections
+Installed Packages
+Name        : tcpdump
+Arch        : x86_64
+Epoch       : 14
+Version     : 4.5.1
+Release     : 3.el7
+Size        : 931 k
+Repo        : installed
+From repo   : jm-repo-CENTOS7
+Summary     : A network traffic monitoring tool
+URL         : http://www.tcpdump.org
+License     : BSD with advertising
+Description : Tcpdump is a command-line tool for monitoring network traffic.
+            : Tcpdump can capture and display the packet headers on a particular
+            : network interface or on all interfaces.  Tcpdump can display all of
+            : the packet headers, or just the ones that match particular criteria.
+            :
+            : Install tcpdump if you need a program to monitor network traffic.
+
+On voit bien que le paquet à été intallé via notre repo
+ 
+   
+ 
+ 
+   
+
+   
+   
+   
+C) Administration des dépôts
+   
+ 
+ 
 
 
 
