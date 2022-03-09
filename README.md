@@ -532,8 +532,26 @@ SUB    = The low-level unit activation state, values depend on unit type.
 158 loaded units listed. Pass --all to see loaded but inactive units, too.
 To show all installed unit files use 'systemctl list-unit-files'.
 
-- Gestion des services
-- Gestions de cibles (target), gérer les niveaux d'éxécution
+Gestion des services
+---------------------
+
+Systemd fournit la commande systemctl pour gérer les services
+- Lister toutes les unités de services:
+  systemctl list-units -t service
+- Visualiser l'état d'un service:
+  systemctl status NetworkManager
+- Démmarer, arrêter un service:
+   systemctl start sshd
+   systemctl stop sshd
+   
+Quand on supprime un service au démmarge , exemple systemctl disable sshd , le lien de la target est supprimé:
+
+ /etc/systemd/system/multi-user.target.wants/sshd.service -> /usr/lib/systemd/system/sshd.service
+ 
+ C'est ce lien : /etc/systemd/system/multi-user.target.wants/sshd.service qui est supprimé
+ 
+
+
 [root@srvcentos7 ~]# ls -l /etc/systemd/
 total 28
 -rw-r--r--.  1 root root  720 Jan 13 17:54 bootchart.conf
@@ -646,6 +664,12 @@ AllowIsolate=yes
 
 Il vas démmaré que si le mode si le mode multi utilisateur est démmaré et il vas démmaré après ce mode
 
+Ici on peut voir toutes les target :
+ll /usr/lib/systemd/system/*.target
+
+Et ici tout les service :
+ll /usr/lib/systemd/system/*.service
+
 
 
 - le type service : estions de démons
@@ -656,12 +680,357 @@ Il vas démmaré que si le mode si le mode multi utilisateur est démmaré et il
 -  le type snapshot : permet de sauvegarder et de restaurer l'état des services.
 
 
+Gestions de cibles (target), gérer les niveaux d'éxécution
+-----------------------------------------------------------
+
+- changer de niveau de cible temporairement:
+ systemctl isolate rescue.target
+
+- Obtenir le niveau de fonctionnement par défaut:
+ systemctl get-default
+ 
+- Modifier le niveau de fonctionnement par défaut:
+systemctl set-default grapical.target
+
+
+Creer un service systemd
+-------------------------
+
+- Les fichiers de config de systemd
+  - /lib/systemd/system ou /usr/lib/systemd/system : contient tous les services à démmarer
+  - /etc/systemd/system : Contient la configuration de systemmd
+  - /etc/systemd/user : Endroit des services à ajouter par l'admin
+  
+- Créer un service systemd
+
+cat /usr/lib/systemd/system/notre_service.service
+
+[Unit]
+
+Description=Notre service echo daemon
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/service_jm
+ExecStop=/bin/kill -KILL $MAINPID
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+
+systemctl enable notre_service.service
 
 
 
 
+Installer et gérer des logiciels
+---------------------------------
+
+
+Redahat Packet Manager : RPM
+---
+
+- Le format RPM
+  un paquet est contitué:
+    - d'une archive de fichiers
+    - De métadonnées utilisées pour installer et supprimer les fichiers de l'archive
+    - Les métadonnées incluent les scripts assistnts , les attibuts des fichiers , et des informations décrivant le paquet
+
+wget http://mirror.centos.org/centos/7/os/x86_64/Packages/net-tools-2.0-0.25.20131004git.el7.x86_64.rpm
+
+rpm2cpio net-tools-2.0-0.25.20131004git.el7.x86_64.rpm | cpio -idvm
+  
+ mkdir rpms
+  
+ mv net-tools-2.0-0.25.20131004git.el7.x86_64.rpm rpms
+  281  cd rpms/
+  282  rpm2cpio net-tools-2.0-0.25.20131004git.el7.x86_64.rpm | cpio -idvm
+  
+  [root@Host-002 rpms]# ls -l
+total 308
+drwxr-xr-x. 2 root root     21 Mar  9 04:37 bin
+-rw-r--r--. 1 root root 312968 Aug 22  2019 net-tools-2.0-0.25.20131004git.el7.x86_64.rpm
+drwxr-xr-x. 2 root root    175 Mar  9 04:37 sbin
+drwxr-xr-x. 4 root root     30 Mar  9 04:37 usr
+
+- Manipulation des RPM
+  Installer un paquet:
+  rpm -ivh paquet
+  
+  Mettre à jour un paquet:
+  rpm -Uvh paquet
+  
+  Désinstaller un paquet :
+  rpm -evh paquet
+  
+  
+  [root@Host-002 rpms]# rpm -Uvh net-tools-2.0-0.25.20131004git.el7.x86_64.rpm
+warning: net-tools-2.0-0.25.20131004git.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:net-tools-2.0-0.25.20131004git.el################################# [ 50%]
+Cleaning up / removing...
+   2:net-tools-2.0-0.17.20131004git.el################################# [100%]
+[root@Host-002 rpms]# rpm -q net-tools
+net-tools-2.0-0.25.20131004git.el7.x86_64
+[root@Host-002 rpms]# rpm -evh net-tools-2.0-0.25.20131004git.el7.x86_64
+error: Failed dependencies:
+        net-tools is needed by (installed) open-vm-tools-10.0.5-2.el7.x86_64
+[root@Host-002 rpms]# rpm -evh net-tools-2.0-0.25.20131004git.el7.x86_64
+error: Failed dependencies:
+        net-tools is needed by (installed) open-vm-tools-10.0.5-2.el7.x86_64
+[root@Host-002 rpms]# rpm -ivh net-tools-2.0-0.25.20131004git.el7.x86_64
+error: open of net-tools-2.0-0.25.20131004git.el7.x86_64 failed: No such file or directory
+[root@Host-002 rpms]# rpm -Uvh net-tools-2.0-0.25.20131004git.el7.x86_64.rpm
+warning: net-tools-2.0-0.25.20131004git.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY
+Preparing...                          ################################# [100%]
+        package net-tools-2.0-0.25.20131004git.el7.x86_64 is already installed
+[root@Host-002 rpms]# l -l /sbin/if
+ifcfg      ifconfig   ifdown     ifenslave  ifstat     ifup
+[root@Host-002 rpms]# l -l /sbin/ifconfig
+bash: l: command not found...
+[root@Host-002 rpms]# ls -l /sbin/ifconfig
+-rwxr-xr-x. 1 root root 81976 Aug  8  2019 /sbin/ifconfig
+[root@Host-002 rpms]# rpm -qf /bin/netstat
+net-tools-2.0-0.25.20131004git.el7.x86_64
+[root@Host-002 rpms]# rpm -qf /bin/pwd
+coreutils-8.22-18.el7.x86_64
+[root@Host-002 rpms]# rpm -qf /bin/gs
+ghostscript-9.07-20.el7.x86_64
+[root@Host-002 rpms]# rpm -q net-tools
+net-tools-2.0-0.25.20131004git.el7.x86_64
+[root@Host-002 rpms]# rpm -evh net-tools-2.0-0.25.20131004git.el7.x86_64
+error: Failed dependencies:
+        net-tools is needed by (installed) open-vm-tools-10.0.5-2.el7.x86_64
+[root@Host-002 rpms]# rpm -qf /etc/sudoers
+sudo-1.8.6p7-20.el7.x86_64
+[root@Host-002 rpms]#
+
+  
+- Limitations des RPM
+Trop dépendances de librairies à gérer 
+
+
+YUM - Yellowdog Updater Modified
+--------------------------------
+
+- YUM
+  yum gère l'installtion, la suppression , la recherche et la maj des logiciels
+  yum télécharge les paquêts à partir de dépôts
+  yum est une surcouche à rpm
+- Manipulation des paquets avec Yum
+  
+  search : recherche dans tous les paquets le terme httpd:
+         yum search httpd
+  list: Recherche un paquet portant le nom httpd
+         yum list httpd ou yum list httpd\*
+  info: Obtenir des infos sur le paquet httpd:
+         yum info httpd
+  install : Installe le paquet httpd et ses dépendances:
+         yum install httpd
+  remove: Supprime le paquet httpd
+         yum remove httpd
+         
+  [root@Host-002 rpms]# yum search httpd
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+============================================================= N/S matched: httpd ============================================================
+keycloak-httpd-client-install.noarch : Tools to configure Apache HTTPD as Keycloak client
+libmicrohttpd-devel.i686 : Development files for libmicrohttpd
+libmicrohttpd-devel.x86_64 : Development files for libmicrohttpd
+libmicrohttpd-doc.noarch : Documentation for libmicrohttpd
+python2-keycloak-httpd-client-install.noarch : Tools to configure Apache HTTPD as Keycloak client
+httpd.x86_64 : Apache HTTP Server
+httpd-devel.x86_64 : Development interfaces for the Apache HTTP server
+httpd-manual.noarch : Documentation for the Apache HTTP server
+httpd-tools.x86_64 : Tools for use with the Apache HTTP Server
+libmicrohttpd.i686 : Lightweight library for embedding a webserver in applications
+libmicrohttpd.x86_64 : Lightweight library for embedding a webserver in applications
+mod_auth_mellon.x86_64 : A SAML 2.0 authentication module for the Apache Httpd Server
+mod_dav_svn.x86_64 : Apache httpd module for Subversion server
+
+  Name and summary matches only, use "search all" for everything.
+[root@Host-002 rpms]#
+       
+         
+ [root@Host-002 rpms]# yum list httpd
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Available Packages
+httpd.x86_64                                                   2.4.6-97.el7.centos.4                                                   updates
+[root@Host-002 rpms]# yum list httpd\*
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Available Packages
+httpd.x86_64                                                      2.4.6-97.el7.centos.4                                                updates
+httpd-devel.x86_64                                                2.4.6-97.el7.centos.4                                                updates
+httpd-manual.noarch                                               2.4.6-97.el7.centos.4                                                updates
+httpd-tools.x86_64                                                2.4.6-97.el7.centos.4                                                updates
+[root@Host-002 rpms]# yum info httpd
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Available Packages
+Name        : httpd
+Arch        : x86_64
+Version     : 2.4.6
+Release     : 97.el7.centos.4
+Size        : 2.7 M
+Repo        : updates/7/x86_64
+Summary     : Apache HTTP Server
+URL         : http://httpd.apache.org/
+License     : ASL 2.0
+Description : The Apache HTTP Server is a powerful, efficient, and extensible
+            : web server.
+
+
+[root@Host-002 rpms]# yum install httpd
+Loaded plugins: fastestmirror, langpacks
+base                                                                                                                  | 3.6 kB  00:00:00
+extras                                                                                                                | 2.9 kB  00:00:00
+updates                                                                                                               | 2.9 kB  00:00:00
+Loading mirror speeds from cached hostfile
+ * base: centos.crazyfrogs.org
+ * extras: mirrors.ircam.fr
+ * updates: ftp.pasteur.fr
+Resolving Dependencies
+--> Running transaction check
+---> Package httpd.x86_64 0:2.4.6-97.el7.centos.4 will be installed
+--> Processing Dependency: httpd-tools = 2.4.6-97.el7.centos.4 for package: httpd-2.4.6-97.el7.centos.4.x86_64
+--> Processing Dependency: /etc/mime.types for package: httpd-2.4.6-97.el7.centos.4.x86_64
+--> Processing Dependency: libaprutil-1.so.0()(64bit) for package: httpd-2.4.6-97.el7.centos.4.x86_64
+--> Processing Dependency: libapr-1.so.0()(64bit) for package: httpd-2.4.6-97.el7.centos.4.x86_64
+--> Running transaction check
+---> Package apr.x86_64 0:1.4.8-7.el7 will be installed
+---> Package apr-util.x86_64 0:1.5.2-6.el7 will be installed
+---> Package httpd-tools.x86_64 0:2.4.6-97.el7.centos.4 will be installed
+---> Package mailcap.noarch 0:2.1.41-2.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================
+ Package                          Arch                        Version                                     Repository                    Size
+=============================================================================================================================================
+Installing:
+ httpd                            x86_64                      2.4.6-97.el7.centos.4                       updates                      2.7 M
+Installing for dependencies:
+ apr                              x86_64                      1.4.8-7.el7                                 base                         104 k
+ apr-util                         x86_64                      1.5.2-6.el7                                 base                          92 k
+ httpd-tools                      x86_64                      2.4.6-97.el7.centos.4                       updates                       94 k
+ mailcap                          noarch                      2.1.41-2.el7                                base                          31 k
+
+Transaction Summary
+=============================================================================================================================================
+Install  1 Package (+4 Dependent packages)
+
+Total download size: 3.0 M
+Installed size: 10 M
+Is this ok [y/d/N]: y
+Downloading packages:
+warning: /var/cache/yum/x86_64/7/base/packages/apr-1.4.8-7.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY-:--:-- ETA
+Public key for apr-1.4.8-7.el7.x86_64.rpm is not installed
+(1/5): apr-1.4.8-7.el7.x86_64.rpm                                                                                     | 104 kB  00:00:00
+(2/5): mailcap-2.1.41-2.el7.noarch.rpm                                                                                |  31 kB  00:00:00
+Public key for httpd-tools-2.4.6-97.el7.centos.4.x86_64.rpm is not installed
+(3/5): httpd-tools-2.4.6-97.el7.centos.4.x86_64.rpm                                                                   |  94 kB  00:00:00
+(4/5): apr-util-1.5.2-6.el7.x86_64.rpm                                                                                |  92 kB  00:00:00
+(5/5): httpd-2.4.6-97.el7.centos.4.x86_64.rpm                                                                         | 2.7 MB  00:00:02
+---------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                        1.0 MB/s | 3.0 MB  00:00:02
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Importing GPG key 0xF4A80EB5:
+ Userid     : "CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>"
+ Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5
+ Package    : centos-release-7-3.1611.el7.centos.x86_64 (@anaconda)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Is this ok [y/N]: y
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+Warning: RPMDB altered outside of yum.
+  Installing : apr-1.4.8-7.el7.x86_64                                                                                                    1/5
+  Installing : apr-util-1.5.2-6.el7.x86_64                                                                                               2/5
+  Installing : httpd-tools-2.4.6-97.el7.centos.4.x86_64                                                                                  3/5
+  Installing : mailcap-2.1.41-2.el7.noarch                                                                                               4/5
+  Installing : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        5/5
+  Verifying  : httpd-tools-2.4.6-97.el7.centos.4.x86_64                                                                                  1/5
+  Verifying  : apr-1.4.8-7.el7.x86_64                                                                                                    2/5
+  Verifying  : mailcap-2.1.41-2.el7.noarch                                                                                               3/5
+  Verifying  : httpd-2.4.6-97.el7.centos.4.x86_64                                                                                        4/5
+  Verifying  : apr-util-1.5.2-6.el7.x86_64                                                                                               5/5
+
+Installed:
+  httpd.x86_64 0:2.4.6-97.el7.centos.4
+
+Dependency Installed:
+  apr.x86_64 0:1.4.8-7.el7    apr-util.x86_64 0:1.5.2-6.el7    httpd-tools.x86_64 0:2.4.6-97.el7.centos.4    mailcap.noarch 0:2.1.41-2.el7
+
+Complete!
+
+[root@Host-002 rpms]# yum list installed | grep httpd
+httpd.x86_64                           2.4.6-97.el7.centos.4           @updates
+httpd-tools.x86_64                     2.4.6-97.el7.centos.4           @updates
+[root@Host-002 rpms]#
+
+
+
+[root@Host-002 rpms]# yum history
+Loaded plugins: fastestmirror, langpacks
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+     2 | jm <jm>                  | 2022-03-09 05:12 | Install        |    5  <
+     1 | System <unset>           | 2022-03-08 11:57 | Install        | 1257 >
+history list
+[root@Host-002 rpms]# yum history list
+Loaded plugins: fastestmirror, langpacks
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+     2 | jm <jm>                  | 2022-03-09 05:12 | Install        |    5  <
+     1 | System <unset>           | 2022-03-08 11:57 | Install        | 1257 >
+history list
+[root@Host-002 rpms]# yum history info 2
+Loaded plugins: fastestmirror, langpacks
+Transaction ID : 2
+Begin time     : Wed Mar  9 05:12:02 2022
+Begin rpmdb    : 1257:87d415d33f828617edb494eed01a09e6391a8b0d
+End time       :            05:12:16 2022 (14 seconds)
+End rpmdb      : 1262:302baf965374930e3c6c67669eafc4ecf16f9fe8
+User           : jm <jm>
+Return-Code    : Success
+Command Line   : install httpd
+Transaction performed with:
+    Installed     rpm-4.11.3-21.el7.x86_64                      @anaconda
+    Installed     yum-3.4.3-150.el7.centos.noarch               @anaconda
+    Installed     yum-plugin-fastestmirror-1.1.31-40.el7.noarch @anaconda
+Packages Altered:
+    Dep-Install apr-1.4.8-7.el7.x86_64                   @base
+    Dep-Install apr-util-1.5.2-6.el7.x86_64              @base
+    Install     httpd-2.4.6-97.el7.centos.4.x86_64       @updates
+    Dep-Install httpd-tools-2.4.6-97.el7.centos.4.x86_64 @updates
+    Dep-Install mailcap-2.1.41-2.el7.noarch              @base
+history info
+[root@Host-002 rpms]#
+
+
+
+[root@Host-002 rpms]#
+
+- Manipulation des groupes avec Yum
 
 
 
 
-   
