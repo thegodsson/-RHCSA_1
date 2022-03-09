@@ -1382,7 +1382,7 @@ drwxrwxr-x. 2 root root   4096 Dec  5  2016 repodata
  cp /mnt/iso/RPM-GPG-KEY-CentOS-7 /etc/pki/rpm-gpg/
    
  4) On creé le repo:
-  createrepo /srv/jm.repo/7/x86_64/
+  createrepo /srv/jm.repo/7/x86_64/  --> faire cette commande avant de creer le fichier .repo, sinon il est détruit
    
  5) On configure le fichier dans yum.repo.d
    
