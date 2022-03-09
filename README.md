@@ -1624,6 +1624,125 @@ On peut également cela avec "yum-config-manager"
    yum-config-manager
    
    - Lister le dépot principal main
+   
+   
+   09/03/2022:
+   
+   Ma machine à crasher j'ai perdu pas pas de chode mais bon:
+   
+   Revoir journalctl très puissant et meme approfoncir sur le sujet.
+   
+   [root@Host-002 ~]# journalctl -u
+abrtd.service                      NetworkManager.service
+alsa-state.service                 network.service
+auditd.service                     polkit.service
+avahi-daemon.service               postfix.service
+chronyd.service                    rngd.service
+crond.service                      rpc-statd-notify.service
+dbus.service                       session-1.scope
+fprintd.service                    session-2.scope
+irqbalance.service                 session-3.scope
+kdump.service                      smartd.service
+libvirtd.service                   sshd.service
+lvm2-monitor.service               systemd-fsck-root.service
+lvm2-pvscan@8:2.service            systemd-hostnamed.service
+mcelog.service                     systemd-journald.service
+ModemManager.service               systemd-logind.service
+NetworkManager-dispatcher.service  systemd-udevd.service
+[root@Host-002 ~]# journalctl -u sshd.service
+[root@Host-002 ~]# journalctl -u sshd.service
+-- Logs begin at Wed 2022-03-09 13:08:42 EST, end at Wed 2022-03-09 13:11:55 EST
+Mar 09 13:09:19 Host-002 systemd[1]: Starting OpenSSH server daemon...
+Mar 09 13:09:20 Host-002 sshd[1109]: Server listening on 0.0.0.0 port 22.
+Mar 09 13:09:20 Host-002 sshd[1109]: Server listening on :: port 22.
+Mar 09 13:09:20 Host-002 systemd[1]: PID file /var/run/sshd.pid not readable (ye
+Mar 09 13:09:20 Host-002 systemd[1]: Started OpenSSH server daemon.
+Mar 09 13:11:19 Host-002 sshd[1401]: Accepted password for jm from 192.168.1.25
+lines 1-7/7 (END)
+[root@Host-002 ~]# journalctl -u sshd.service --priority err
+-- No entries --
+[root@Host-002 ~]# journalctl  --priority err
+-- Logs begin at Wed 2022-03-09 13:08:42 EST, end at Wed 2022-03-09 13:11:55 EST
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: warning: 32 bytes ignored in
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: consider an update
+Mar 09 13:09:03 localhost.localdomain mcelog[695]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:20 Host-002 systemd[1]: Failed to start Crash recovery kernel armin
+
+[root@Host-002 ~]# journalctl -u sshd.service
+-- Logs begin at Wed 2022-03-09 13:08:42 EST, end at Wed 2022-03-09 13:11:55 EST
+Mar 09 13:09:19 Host-002 systemd[1]: Starting OpenSSH server daemon...
+Mar 09 13:09:20 Host-002 sshd[1109]: Server listening on 0.0.0.0 port 22.
+Mar 09 13:09:20 Host-002 sshd[1109]: Server listening on :: port 22.
+Mar 09 13:09:20 Host-002 systemd[1]: PID file /var/run/sshd.pid not readable (ye
+Mar 09 13:09:20 Host-002 systemd[1]: Started OpenSSH server daemon.
+Mar 09 13:11:19 Host-002 sshd[1401]: Accepted password for jm from 192.168.1.25
+ ^X
+[root@Host-002 ~]# journalctl  --priority err  --> on peut filter pour voir les erreurs
+-- Logs begin at Wed 2022-03-09 13:08:42 EST, end at Wed 2022-03-09 13:11:55 EST
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: warning: 32 bytes ignored in
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: consider an update
+Mar 09 13:09:03 localhost.localdomain mcelog[695]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:20 Host-002 systemd[1]: Failed to start Crash recovery kernel armin
+lines 1-8/8 (END)
+[root@Host-002 ~]# journalctl  --
+--after-cursor    --follow          --merge           --show-cursor
+--all             --force           --new-id128       --since
+--boot            --full            --no-full         --system
+--catalog         --header          --no-pager        --this-boot
+--cursor          --help            --no-tail         --unit
+--directory       --identifier      --output          --until
+--disk-usage      --interval        --pager-end       --update-catalog
+--dmesg           --lines           --priority        --user
+--dump-catalog    --list-boots      --quiet           --utc
+--field           --list-catalog    --reverse         --verify
+--file            --local           --root            --verify-key
+--flush           --machine         --setup-keys      --version
+[root@Host-002 ~]# journalctl  --disk-usage
+Archived and active journals take up 6.1M on disk.
+[root@Host-002 ~]# journalctl  --priority err
+-- Logs begin at Wed 2022-03-09 13:08:42 EST, end at Wed 2022-03-09 13:11:55 EST
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:08:43 localhost.localdomain kernel: [drm:vmw_host_log [vmwgfx]] *ERROR
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: warning: 32 bytes ignored in
+Mar 09 13:09:03 localhost.localdomain mcelog[687]: consider an update
+Mar 09 13:09:03 localhost.localdomain mcelog[695]: Family 6 Model 9e CPU: only d
+Mar 09 13:09:20 Host-002 systemd[1]: Failed to start Crash recovery kernel armin
+lines 1-8/8 (END)
+[root@Host-002 ~]# journalctl  --priority warn
+Unknown log level warn
+[root@Host-002 ~]# journalctl  --priority crit
+-- No entries --
+[root@Host-002 ~]# journalctl -u sshd.service --priority err --> on peut meme combiné
+-- No entries --
+[root@Host-002 ~]#
+
+   
+ --------------------
+ Mise en réseau
+ ---------------
+   
+   
+  1) Introduction aux réseaux locaux
+  2) La couche Ethernet
+  3) Les réseaux de type TCP/IP
+  4) Les interfaces réseaux
+   
+  --------------
+  Installation
+   
+ 
+   
+   
+   
+   
+   
    yum-config-manager main
    
    --disable: Désactiver un dépôt 
