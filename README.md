@@ -1625,6 +1625,14 @@ On peut également cela avec "yum-config-manager"
    
    - Lister le dépot principal main
    
+   yum-config-manager main
+   
+   --disable: Désactiver un dépôt 
+   yum-config-manager --disable main
+   
+   --enable : Activer le dépot main
+   yum-config-manager --enable main
+   
    
    09/03/2022:
    
@@ -1743,13 +1751,6 @@ Unknown log level warn
    
    
    
-   yum-config-manager main
-   
-   --disable: Désactiver un dépôt 
-   yum-config-manager --disable main
-   
-   --enable : Activer le dépot main
-   yum-config-manager --enable main
    
    
    
