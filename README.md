@@ -1381,6 +1381,8 @@ drwxrwxr-x. 2 root root   4096 Dec  5  2016 repodata
    
  cp /mnt/iso/RPM-GPG-KEY-CentOS-7 /etc/pki/rpm-gpg/
    
+ 
+   
  4) On creé le repo:
   createrepo /srv/jm.repo/7/x86_64/  --> faire cette commande avant de creer le fichier .repo, sinon il est détruit
    
@@ -1394,6 +1396,8 @@ enabled = 1
 gpgcheck = 1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 [root@Host-002 yum.repos.d]#
+ 
+yum-config-manager --add-repo file:///etc/yum.repos.d/jm.repo
 
 [root@Host-002 yum.repos.d]# yum repolist
 Loaded plugins: fastestmirror, langpacks
@@ -1502,7 +1506,94 @@ Description : Tcpdump is a command-line tool for monitoring network traffic.
 
 On voit bien que le paquet à été intallé via notre repo
  
+ Ajouter un nouveau repo exemple: epel:
    
+ [root@Host-002 ~]# wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+--2022-03-09 08:05:16--  https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+Resolving dl.fedoraproject.org (dl.fedoraproject.org)... 38.145.60.22, 38.145.60.24, 38.145.60.23
+Connecting to dl.fedoraproject.org (dl.fedoraproject.org)|38.145.60.22|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 15608 (15K) [application/x-rpm]
+Saving to: ‘epel-release-latest-7.noarch.rpm’
+
+100%[===================================================================================================>] 15,608      92.3KB/s   in 0.2s
+
+2022-03-09 08:05:17 (92.3 KB/s) - ‘epel-release-latest-7.noarch.rpm’ saved [15608/15608]
+
+[root@Host-002 ~]# ls
+anaconda-ks.cfg  epel-release-latest-7.noarch.rpm  initial-setup-ks.cfg  rpms
+[root@Host-002 ~]# rpm -ivh epel-release-latest-7.noarch.rpm
+warning: epel-release-latest-7.noarch.rpm: Header V4 RSA/SHA256 Signature, key ID 352c64e5: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:epel-release-7-14                ################################# [100%]
+[root@Host-002 ~]# ls -l /etc/yum.repos.d/
+total 40
+-rw-r--r--. 1 root root 1664 Mar  9 06:59 CentOS-Base.repo
+-rw-r--r--. 1 root root 1309 Mar  9 06:59 CentOS-CR.repo
+-rw-r--r--. 1 root root  649 Mar  9 06:59 CentOS-Debuginfo.repo
+-rw-r--r--. 1 root root  314 Mar  9 06:59 CentOS-fasttrack.repo
+-rw-r--r--. 1 root root  630 Mar  9 06:59 CentOS-Media.repo
+-rw-r--r--. 1 root root 1331 Mar  9 06:59 CentOS-Sources.repo
+-rw-r--r--. 1 root root 2893 Mar  9 06:59 CentOS-Vault.repo
+-rw-r--r--. 1 root root 1358 Sep  4  2021 epel.repo
+-rw-r--r--. 1 root root 1457 Sep  4  2021 epel-testing.repo
+-rw-r--r--. 1 root root  181 Mar  9 07:03 jm.repo
+[root@Host-002 ~]# cat /etc/yum.repos.d/epel.repo
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place its address here.
+#baseurl=http://download.example/pub/epel/7/$basearch
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch&infra=$infra&content=$contentdir
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place its address here.
+#baseurl=http://download.example/pub/epel/7/$basearch/debug
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch&infra=$infra&content=$contentdir
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=http://download.example/pub/epel/7/source/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch&infra=$infra&content=$contentdir
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+[root@Host-002 ~]# yum repolist
+Loaded plugins: fastestmirror, langpacks, priorities
+epel/x86_64/metalink                                                                                                  |  24 kB  00:00:00
+epel                                                                                                                  | 4.7 kB  00:00:00
+(1/3): epel/x86_64/group_gz                                                                                           |  96 kB  00:00:00
+(2/3): epel/x86_64/updateinfo                                                                                         | 1.0 MB  00:00:05
+(3/3): epel/x86_64/primary_db                                                                                         | 7.0 MB  00:00:07
+Loading mirror speeds from cached hostfile
+ * base: centos.mirror.fr.planethoster.net
+ * epel: mirror.de.leaseweb.net
+ * extras: ftp.pasteur.fr
+ * updates: mirrors.ircam.fr
+6985 packages excluded due to repository priority protections
+repo id                                               repo name                                                                   status
+base/7/x86_64                                         CentOS-7 - Base                                                             5,109+4,963
+epel/x86_64                                           Extra Packages for Enterprise Linux 7 - x86_64                                 13,740+5
+extras/7/x86_64                                       CentOS-7 - Extras                                                                   509
+jm-repo-CENTOS7/7/x86_64                              JM CENTOS7                                                                        3,831
+updates/7/x86_64                                      CentOS-7 - Updates                                                          1,552+2,018
+repolist: 24,741
+[root@Host-002 ~]#
+
  
  
    
@@ -1513,7 +1604,36 @@ On voit bien que le paquet à été intallé via notre repo
 C) Administration des dépôts
    
  
- 
+ Yum offre la gestion des dépôt
+   
+   - repolist all : Lister tous les dépôts installés:
+   yum repolistall
+   
+   - repolist: Lister les dépôts actifs:
+   yum repolist
+   
+   - repolist disable: Désactiver un reôt
+   yum repolist disabled
+   
+   - repolist enable: Activer un dépôt
+   yum repolist enable "Mon dépôts"
+   
+On peut également cela avec "yum-config-manager"
+   
+   - Lister tout les dépôts installés:
+   yum-config-manager
+   
+   - Lister le dépot principal main
+   yum-config-manager main
+   
+   --disable: Désactiver un dépôt 
+   yum-config-manager --disable main
+   
+   --enable : Activer le dépot main
+   yum-config-manager --enable main
+   
+   
+   
 
 
 
