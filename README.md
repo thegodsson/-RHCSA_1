@@ -1738,9 +1738,412 @@ Unknown log level warn
    
    
   1) Introduction aux réseaux locaux
+    - Les réseaux locaux
+    - Les modèles en couches
   2) La couche Ethernet
+     - Vérifier la connectivité de la carte et modifier des options:
+     mii-tools interface
+     mii-tool -F 100baseTx-FD interface
+     - Obtenir des info sur la carte Ethernet
+      ethtool interface
+      ethtool -s interface speed 100 duplex full autoneg off
+     - Visualiser la table arp:
+     arp -a -v 
+   
+   [root@Host-002 ~]# mii-tool -v enp0s3
+enp0s3: no autonegotiation, 1000baseT-FD flow-control, link ok  --> le lien est ok, si par exemple on a un problème de connexio un peut déja vérifier en premier lieu que cela est ok
+  product info: Yukon 88E1011 rev 4
+  basic mode:   autonegotiation enabled
+  basic status: autonegotiation complete, link ok
+  capabilities: 1000baseT-FD 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD  --> ici on as toutes les possibilités de la carte
+  advertising:  1000baseT-FD 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD flow-control
+  link partner: 1000baseT-HD 1000baseT-FD 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD
+   
+  [root@Host-002 ~]# ethtool enp0s3
+Settings for enp0s3:
+        Supported ports: [ TP ]
+        Supported link modes:   10baseT/Half 10baseT/Full
+                                100baseT/Half 100baseT/Full
+                                1000baseT/Full
+        Supported pause frame use: No
+        Supports auto-negotiation: Yes
+        Advertised link modes:  10baseT/Half 10baseT/Full
+                                100baseT/Half 100baseT/Full
+                                1000baseT/Full
+        Advertised pause frame use: No
+        Advertised auto-negotiation: Yes
+        Speed: 1000Mb/s
+        Duplex: Full
+        Port: Twisted Pair
+        PHYAD: 0
+        Transceiver: internal
+        Auto-negotiation: on
+        MDI-X: off (auto)
+        Supports Wake-on: umbg
+        Wake-on: d
+        Current message level: 0x00000007 (7)
+                               drv probe link
+        Link detected: yes
+[root@Host-002 ~]#
+
+   
+   
+   
+   
+[root@Host-002 ~]#
+   
   3) Les réseaux de type TCP/IP
   4) Les interfaces réseaux
+  
+   - Introduction à NetworkManager
+   Depuis redhat 7 , le service réseau est géré par NetworkManager
+   NetworkManager est un démon qui permet la configuration dynamique des périphérique réseau, plus besoin de rentré dans les fichier de conf , se fait de manière interactive
+   NetworkManager utilise toujours les fichiers de configurations ifcfg
+     
+   outils : 
+   - nmtui : Outil en mode console pour eefectuer les config de NetworkManager
+   - nmcli : outil en ligne de commande pour configurer  les interfaces
+   - nm-connection-editor : Un outil en mode gui pour configurer les cartes
+   
+   
+   - Les fichiers de config réseau
+   Redhat EL7 utilise les fichiers de configuration pour conserver les informations TCP/IP de interfaces
+     - /etc/sysconfig/network-scripts/ifcfg-interface ou nom réseau
+   
+  - La commande nmcli
+   - Visualiser l'état de NetworkManager:
+   nmcli general status
+   
+   - Afficher des interfaces 
+   nmcli connection show
+   
+   [root@Host-002 ~]# nmcli  --> plus tabulation donne les différentes sous-commande
+agent       connection  device      general     help        monitor     networking  radio
+[root@Host-002 ~]# nmcli
+   
+  Sur chaque sosu-commmande on peut encore tapé une tabulation pour avoir d'autres sous-commandes:
+  
+   [root@Host-002 ~]# nmcli general
+help         hostname     logging      permissions  status
+[root@Host-002 ~]# nmcli general
+
+
+
+
+   
+   [root@Host-002 ~]# nmcli general status
+STATE      CONNECTIVITY  WIFI-HW  WIFI     WWAN-HW  WWAN
+connected  full          enabled  enabled  enabled  enabled
+   
+[root@Host-002 ~]# nmcli connection show
+NAME    UUID                                  TYPE            DEVICE
+enp0s3  42a784f3-29e9-4a6b-a321-e607f33df8be  802-3-ethernet  enp0s3
+virbr0  6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+enp0s8  61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9  70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]#
+
+ nmcli device show
+  nmcli device connect enp0s3 --> connecté une interface
+  323  nmcli device connect enp0s8
+  324  nmcli connection show
+  325  nmcli device disconnect enp0s8 décoonceté une interface
+   
+  [root@Host-002 ~]# nmcli device show enp0s3
+GENERAL.DEVICE:                         enp0s3
+GENERAL.TYPE:                           ethernet
+GENERAL.HWADDR:                         08:00:27:9E:12:B3
+GENERAL.MTU:                            1500
+GENERAL.STATE:                          100 (connected)
+GENERAL.CONNECTION:                     enp0s3
+GENERAL.CON-PATH:                       /org/freedesktop/NetworkManager/ActiveConnection/3
+WIRED-PROPERTIES.CARRIER:               on
+IP4.ADDRESS[1]:                         192.168.1.8/24
+IP4.GATEWAY:                            192.168.1.254
+IP4.DNS[1]:                             192.168.1.254
+IP4.DOMAIN[1]:                          lan
+IP6.ADDRESS[1]:                         fe80::60ae:2867:6155:374f/64
+IP6.GATEWAY:
+[root@Host-002 ~]#
+
+Configurer une carte:
+nmcli connection add type ethernet con-name WAN ifname enp0s3 ipv4.addresses 192.168.1.8/24 gw4 192.168.1.254
+ supprimer la config:
+nmcli connection delete WAN
+   
+Configuré une carte:
+   
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# nmcli connection add type ethernet con-name WAN ifname enp0s3 ipv4.method manual ipv4.addresses 192.168.1.8/24 gw4 192.168.1.254 ipv4.dns 192.168.1.254,8.8.8.8,8.8.4.4
+Connection 'WAN' (b6e50bfb-e855-457e-a346-1ac0df9be749) successfully added.
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-WAN                                                               TYPE=Ethernet
+BOOTPROTO=none
+IPADDR=192.168.1.8
+PREFIX=24
+GATEWAY=192.168.1.254
+DNS1=192.168.1.254
+DNS2=8.8.8.8
+DNS3=8.8.4.4
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=WAN
+UUID=b6e50bfb-e855-457e-a346-1ac0df9be749
+DEVICE=enp0s3
+ONBOOT=yes
+[root@Host-002 ~]#
+
+   
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# nmcli connection up
+enp0s8                help                  ifname                uuid                  WAN
+enp0s9                id                    path                  virbr0                Wired\ connection\ 1
+
+   
+nmcli device connect enp0s3  
+   
+[root@Host-002 ~]# nmcli connection up WAN
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/9)
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]#
+
+ Config de l'interface DMZ:
+  nmcli connection add type ethernet con-name DMZ ifname enp0s8 ipv4.method manual ipv4.addresses 192.168.2.254/24
+  
+  [root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+DMZ                 1edcb126-7e45-409e-8016-94aa81ee530e  802-3-ethernet  enp0s8
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]#
+
+----------------------
+   
+La bonne méthode pour activer et désactiver une carte:
+
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-DMZ
+cat: /etc/sysconfig/network-scripts/ifcfg-DMZ: No such file or directory
+[root@Host-002 ~]# nmcli connection add type ethernet con-name DMZ ifname enp0s8 ipv4.method manual ipv4.addresses 192.168.2.250/24
+Connection 'DMZ' (23f654e0-451e-4963-bfad-4cf74b46241c) successfully added.
+[root@Host-002 ~]# ls /etc/sysconfig/network-scripts/ifcfg-DMZ                                                                /etc/sysconfig/network-scripts/ifcfg-DMZ
+   
+[root@Host-002 ~]# nmcli connection show                                                                                      NAME                UUID                                  TYPE            DEVICE
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+DMZ                 23f654e0-451e-4963-bfad-4cf74b46241c  802-3-ethernet  --
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+(reverse-i-search)`i': nmcli connect^Cn show
+[root@Host-002 ~]# nmcli connection up DMZ
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/14)
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+DMZ                 23f654e0-451e-4963-bfad-4cf74b46241c  802-3-ethernet  enp0s8
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+   
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-DMZ
+TYPE=Ethernet
+BOOTPROTO=none
+IPADDR=192.168.2.250
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=DMZ
+UUID=23f654e0-451e-4963-bfad-4cf74b46241c
+DEVICE=enp0s8
+ONBOOT=yes
+[root@Host-002 ~]#
+
+On s'est trompé d'adresse ip on veut modifier cela:
+   
+[root@Host-002 ~]# nmcli connection delete DMZ
+Connection 'DMZ' (23f654e0-451e-4963-bfad-4cf74b46241c) successfully deleted.
+   
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# ls /etc/sysconfig/network-scripts/ifcfg-DMZ
+ls: cannot access /etc/sysconfig/network-scripts/ifcfg-DMZ: No such file or directory
+   
+[root@Host-002 ~]# nmcli connection add type ethernet con-name DMZ ifname enp0s8 ipv4.method manual ipv4.addresses 192.168.2.254/24
+Connection 'DMZ' (61713cea-3c01-475c-86f1-af8d5e95a928) successfully added.
+   
+[root@Host-002 ~]# ls /etc/sysconfig/network-scripts/ifcfg-DMZ                                                                /etc/sysconfig/network-scripts/ifcfg-DMZ
+   
+[root@Host-002 ~]# nmcli connection show                                                                                      NAME                UUID                                  TYPE            DEVICE
+DMZ                 61713cea-3c01-475c-86f1-af8d5e95a928  802-3-ethernet  enp0s8
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-DMZ
+TYPE=Ethernet
+BOOTPROTO=none
+IPADDR=192.168.2.254
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=DMZ
+UUID=61713cea-3c01-475c-86f1-af8d5e95a928
+DEVICE=enp0s8
+ONBOOT=yes
+[root@Host-002 ~]#
+
+   Donc :
+   
+ nmcli connection show
+  436  nmcli connection delete DMZ
+  437  nmcli connection show
+  438  ls /etc/sysconfig/network-scripts/ifcfg-DMZ
+  439  nmcli connection add type ethernet con-name DMZ ifname enp0s8 ipv4.method manual ipv4.addresses 192.168.2.254/24
+  440  ls /etc/sysconfig/network-scripts/ifcfg-DMZ
+  441  nmcli connection show
+  442  cat /etc/sysconfig/network-scripts/ifcfg-DMZ
+
+   Si besoin au cas oû lors du show la carte n'est pas active :  nmcli connection up DMZ
+  
+   Configuration de la dernière carte, sans la nommé:
+   
+   [root@Host-002 ~]# nmcli connection add type ethernet  ifname enp0s9 ipv4.method manual ipv4.addresses 192.168.3.254/24       Connection 'ethernet-enp0s9' (d16f0db5-b35d-49d5-b9e9-71abe5473a3e) successfully added.
+   
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+DMZ                 61713cea-3c01-475c-86f1-af8d5e95a928  802-3-ethernet  enp0s8
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+ethernet-enp0s9     d16f0db5-b35d-49d5-b9e9-71abe5473a3e  802-3-ethernet  enp0s9
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+   
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-ethernet-enp0s9
+TYPE=Ethernet
+BOOTPROTO=none
+IPADDR=192.168.3.254
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ethernet-enp0s9
+UUID=d16f0db5-b35d-49d5-b9e9-71abe5473a3e
+DEVICE=enp0s9
+ONBOOT=yes
+[root@Host-002 ~]#
+
+On vas la supprimé et la nommé:
+   
+[root@Host-002 ~]# nmcli connection delete ethernet-enp0s9
+Connection 'ethernet-enp0s9' (d16f0db5-b35d-49d5-b9e9-71abe5473a3e) successfully deleted.
+[root@Host-002 ~]# nmcli connection show
+NAME                UUID                                  TYPE            DEVICE
+DMZ                 61713cea-3c01-475c-86f1-af8d5e95a928  802-3-ethernet  enp0s8
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+(reverse-i-search)`add': nmcli connection add type ethernet  ifname enp0s9 ipv4.method manual ipv4.^Cdresses 192.168.3.254/24 
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-ethernet-enp0s9
+cat: /etc/sysconfig/network-scripts/ifcfg-ethernet-enp0s9: No such file or directory
+[root@Host-002 ~]# nmcli connection add type ethernet con-name LAN ifname enp0s9 ipv4.method manual ipv4.addresses 192.168.3.254/24
+Connection 'LAN' (2158586d-55ae-47ca-be65-7600f6683a77) successfully added.
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-ethernet-enp0s9                                                   cat: /etc/sysconfig/network-scripts/ifcfg-ethernet-enp0s9: No such file or directory
+[root@Host-002 ~]# nmcli connection show                                                                                      NAME                UUID                                  TYPE            DEVICE
+DMZ                 61713cea-3c01-475c-86f1-af8d5e95a928  802-3-ethernet  enp0s8
+LAN                 2158586d-55ae-47ca-be65-7600f6683a77  802-3-ethernet  enp0s9
+WAN                 b6e50bfb-e855-457e-a346-1ac0df9be749  802-3-ethernet  enp0s3
+virbr0              6ae82e79-b9e5-4b4e-b6a5-142d90a8c153  bridge          virbr0
+Wired connection 1  043f204e-c0fa-3307-af09-92d6fb7fc11e  802-3-ethernet  --
+enp0s8              61df8f9f-26d4-4c57-9342-c8473df5f6ae  802-3-ethernet  --
+enp0s9              70263098-89bf-4a2a-ba70-901e534fe041  802-3-ethernet  --
+[root@Host-002 ~]# cat /etc/sysconfig/network-scripts/ifcfg-LAN
+TYPE=Ethernet
+BOOTPROTO=none
+IPADDR=192.168.3.254
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=LAN
+UUID=2158586d-55ae-47ca-be65-7600f6683a77
+DEVICE=enp0s9
+ONBOOT=yes
+[root@Host-002 ~]#
+
+ 
+   
+   
+   - la commande ip
+  
    
   --------------
   Installation
