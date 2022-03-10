@@ -2139,16 +2139,39 @@ DEVICE=enp0s9
 ONBOOT=yes
 [root@Host-002 ~]#
 
- 
+nmcli -p connection show DMZ | more
+nmcli connection down DMZ 
+nmcli connection up DMZ
    
    
    - la commande ip
-  
+   ip + tabulations permet également de voir les sous-commande, par compte je pense que pour tout les commandes avec tabulation , le paquet "bash-completion.noarch" soit installé, et je pense même que toutes les commandes unix ou du moins la majorité dispose de la complétion avec la tabulation.
+   Afficher les interfaces:
+   ip link show
    
-  --------------
-  Installation
+   Connecter une carte réseau:
+   ip link set interface down
+   ip link set interface up
    
- 
+   Afficher la confi ip des interfaces:
+   
+   ip a s
+   
+   Supprimer , ajoute une ip:
+   
+   ip addr del 192.168.1.43/24 dev interface
+   ip addr add 192.168.1.43/24 dev interface
+   
+   Afficher les routes, passerelles:
+   ip r
+   
+   Supprimer , ajouter une route:
+   ip route add 192.168.2.1 dev interface
+   ip route del 192.168.2.1 dev interface
+   ip route add feault via 192.168.2.1 dev interface
+   
+   
+Revenir quand on aura le temps sur la partie 4.L'indispensable shell
    
    
    
